@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<meta name="figure-height" content="545">
+<link rel="stylesheet" href="style/distill-style.css">
+<style>
+  .two { display:grid; grid-template-columns:498px 1fr; gap:44px; align-items:start; margin-top:20px; }
+  .side .h { font-size:10.5px; color:var(--label); margin-bottom:12px; }
+
+  .st { margin-bottom:17px; }
+  .st .n { font-size:10px; color:var(--faint); margin-bottom:6px; }
+  .pairs { font-family:var(--mono); font-size:11.5px; color:var(--body); margin-bottom:7px; }
+  .pairs .w { color:var(--warm); font-weight:700; }
+  .pairs .d { color:var(--faint); }
+  .cor { display:flex; gap:9px; flex-wrap:wrap; }
+  .wd { display:flex; gap:2px; }
+  .p { display:inline-flex; align-items:center; justify-content:center; height:22px; padding:0 5px;
+       border:1px solid var(--cell); font-family:var(--mono); font-size:11px; color:var(--body); }
+  .p.m { background:var(--warm-fill); border-color:var(--warm-line); color:var(--warm); font-weight:700; }
+</style></head>
+<body>
+  <div class="fig-title">Criterion 1 — byte-pair encoding
+    <span class="sub">— merge the pair you see most often, then do it again</span></div>
+
+  <div class="two">
+    <div class="code"><span class="c"># start from single characters</span>
+splits = {w: <span class="k">list</span>(w) <span class="k">for</span> w <span class="k">in</span> corpus}
+vocab  = <span class="k">set</span>(all_characters)
+
+<span class="k">for</span> step <span class="k">in</span> <span class="k">range</span>(n_merges):
+
+    <span class="c"># count every adjacent pair in the corpus,</span>
+    <span class="c"># weighted by how often each word occurs</span>
+    counts = pair_counts(splits)
+
+<span class="hl">    best = max(counts, key=counts.get)   # ← the criterion</span>
+
+    <span class="c"># fuse that pair everywhere it appears</span>
+    apply_merge(splits, best)
+    vocab.add(best)
+
+<span class="c"># vocabulary size = base characters + n_merges</span>
+<span class="c"># nothing here looks at meaning, only at counts</span></div>
+
+    <div class="side">
+      <div class="h">Three rounds on the toy corpus &nbsp;<span class="dim">hug ×10 · pug ×5 · pun ×12 · bun ×4 · hugs ×5</span></div>
+
+      <div class="st">
+        <div class="n">STEP 1</div>
+        <div class="pairs"><span class="w">ug:20</span> <span class="d">pu:17  un:16  hu:15  gs:5  bu:4</span></div>
+        <div class="cor">
+          <div class="wd"><span class="p">h</span><span class="p m">ug</span></div>
+          <div class="wd"><span class="p">p</span><span class="p m">ug</span></div>
+          <div class="wd"><span class="p">p</span><span class="p">u</span><span class="p">n</span></div>
+          <div class="wd"><span class="p">b</span><span class="p">u</span><span class="p">n</span></div>
+          <div class="wd"><span class="p">h</span><span class="p m">ug</span><span class="p">s</span></div>
+        </div>
+      </div>
+
+      <div class="st">
+        <div class="n">STEP 2</div>
+        <div class="pairs"><span class="w">un:16</span> <span class="d">hug:15  pu:12  pug:5  ugs:5  bu:4</span></div>
+        <div class="cor">
+          <div class="wd"><span class="p">h</span><span class="p">ug</span></div>
+          <div class="wd"><span class="p">p</span><span class="p">ug</span></div>
+          <div class="wd"><span class="p">p</span><span class="p m">un</span></div>
+          <div class="wd"><span class="p">b</span><span class="p m">un</span></div>
+          <div class="wd"><span class="p">h</span><span class="p">ug</span><span class="p">s</span></div>
+        </div>
+      </div>
+
+      <div class="st">
+        <div class="n">STEP 3</div>
+        <div class="pairs"><span class="w">hug:15</span> <span class="d">pun:12  pug:5  ugs:5  bun:4</span></div>
+        <div class="cor">
+          <div class="wd"><span class="p m">hug</span></div>
+          <div class="wd"><span class="p">p</span><span class="p">ug</span></div>
+          <div class="wd"><span class="p">p</span><span class="p">un</span></div>
+          <div class="wd"><span class="p">b</span><span class="p">un</span></div>
+          <div class="wd"><span class="p m">hug</span><span class="p">s</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="caption">
+    <b>Frequency is the only thing consulted.</b> After three rounds the corpus needs 8 tokens where it
+    needed 19 characters, and “hug” has become a single unit — not because it means anything, but because
+    those letters kept turning up together. <span class="hi">Whichever language dominates the corpus is the
+    one whose words get absorbed first</span>, and that is the entire origin of the tax.
+  </div>
+  <div class="credit">Every count produced by vocab_algorithms.py, published with this article<span class="sep">·</span>@sushant_p18</div>
+</body></html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="style/cerebras-style.css">
+<style>
+  .stage { top:70px; }
+  /* three-step loop strip */
+  .loop { position:absolute; top:0; left:0; right:0; display:flex; gap:10px; align-items:stretch; }
+  .loop .s { flex:1; background:var(--panel); border:1.5px solid var(--hairline); border-radius:9px; box-shadow:var(--shadow-sm);
+    padding:10px 14px; display:flex; gap:10px; align-items:center; }
+  .loop .s .txt b { font-size:13px; } .loop .s .txt div { font-size:10.5px; color:var(--muted); margin-top:1px; }
+  .loop .rep { align-self:center; font-family:var(--mono); font-size:10px; letter-spacing:1.4px; color:var(--accent);
+    border:1.5px solid var(--accent); border-radius:99px; padding:6px 12px; white-space:nowrap; }
+
+  /* left: growing merge table */
+  .mtab { position:absolute; left:0; top:78px; width:250px; }
+  .mtab .panel { padding:13px 16px 8px; }
+  .mtab h3 { font-family:var(--mono); font-size:11px; letter-spacing:1.6px; margin-bottom:10px; color:var(--ink); }
+  .mtab .mrow { display:flex; align-items:center; gap:8px; padding:8px 0; border-top:1px solid var(--hairline); font-family:var(--mono); font-size:12px; }
+  .mtab .mrow .pair { color:var(--ink-soft); }
+  .mtab .mrow .to { color:var(--muted); }
+  .mtab .mrow .new { color:var(--accent); font-weight:700; }
+  .mtab .mrow .idc { margin-left:auto; font-size:10px; font-weight:700; color:#fff; background:var(--accent); border-radius:4px; padding:2px 7px; }
+  .mtab .note { font-family:var(--mono); font-size:9.5px; color:var(--muted); margin-top:10px; line-height:1.5; }
+
+  /* right: stream evolving */
+  .streams { position:absolute; left:274px; right:0; top:78px; display:flex; flex-direction:column; gap:11px; }
+  .srow { background:var(--panel); border:1.5px solid var(--hairline); border-radius:9px; box-shadow:var(--shadow-sm);
+    padding:11px 14px; display:flex; align-items:center; gap:14px; position:relative; }
+  .srow.final { border:2px solid var(--accent); box-shadow:0 0 0 4px var(--accent-soft), var(--shadow); }
+  .srow .lab { width:74px; font-family:var(--mono); font-size:9.5px; letter-spacing:1px; text-transform:uppercase; color:var(--muted); line-height:1.35; flex:none; }
+  .srow .lab b { color:var(--ink); display:block; font-size:11px; }
+  .seq { display:flex; gap:5px; align-items:center; flex-wrap:wrap; flex:1; }
+  .cnt { flex:none; width:78px; text-align:right; font-family:var(--mono); }
+  .cnt .n { font-size:22px; font-weight:700; letter-spacing:-1px; color:var(--ink); }
+  .cnt.hot .n { color:var(--accent); }
+  .cnt .l { font-size:9px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; }
+  /* bracket that marks the winning pair about to merge */
+  .pairmark { display:inline-flex; gap:0; padding:3px; border:1.5px dashed var(--accent); border-radius:8px; background:var(--accent-soft); }
+  .pairmark .tok { box-shadow:none; }
+  /* payoff callout */
+  .payoff { position:absolute; left:0; right:0; bottom:0; }
+  .payoff .callout { display:flex; align-items:center; gap:22px; padding:15px 22px; }
+  .payoff .lead { margin:0; white-space:nowrap; }
+  .payoff .txt { font-size:14px; line-height:1.5; }
+  .payoff .txt b { color:#fff; }
+</style></head>
+<body>
+  <div class="figbar">
+    <div class="l">BPE TRAINING <span class="dim">/ THE MERGE LOOP</span></div>
+    <div class="r">START FROM BYTES · MERGE UPWARD</div>
+  </div>
+
+  <div class="stage">
+    <div class="loop">
+      <div class="s"><span class="stepno hot">1</span><div class="txt"><b>Count pairs</b><div>every adjacent token pair</div></div></div>
+      <div class="s"><span class="stepno hot">2</span><div class="txt"><b>Merge the top pair</b><div>most frequent → one new token</div></div></div>
+      <div class="s"><span class="stepno hot">3</span><div class="txt"><b>Assign next id</b><div>starts at 256, then +1…</div></div></div>
+      <div class="rep">↻ REPEAT → |vocab| = target</div>
+    </div>
+
+    <!-- merge table (left) -->
+    <div class="mtab">
+      <div class="panel">
+        <h3>LEARNED MERGES</h3>
+        <div class="mrow"><span class="pair">( t · h )</span><span class="to">→</span><span class="new">th</span><span class="idc">256</span></div>
+        <div class="mrow"><span class="pair">( th · e )</span><span class="to">→</span><span class="new">the</span><span class="idc">257</span></div>
+        <div class="mrow"><span class="pair">( the · ␣ )</span><span class="to">→</span><span class="new">the␣</span><span class="idc">258</span></div>
+        <div class="note">Rules apply in this order at encode time.<br>Equal-frequency pairs break by a fixed order — training is deterministic.</div>
+      </div>
+    </div>
+
+    <!-- streams (right) -->
+    <div class="streams">
+      <!-- start -->
+      <div class="srow">
+        <div class="lab"><b>Start</b>raw bytes</div>
+        <div class="seq">
+          <span class="pairmark"><span class="tok byte">t</span><span class="tok byte">h</span></span>
+          <span class="tok byte">e</span><span class="tok byte">␣</span>
+          <span class="tok byte">t</span><span class="tok byte">h</span><span class="tok byte">e</span><span class="tok byte">␣</span>
+          <span class="tok byte">t</span><span class="tok byte">h</span><span class="tok byte">e</span><span class="tok byte">n</span>
+        </div>
+        <div class="cnt"><span class="n">12</span><div class="l">tokens</div></div>
+      </div>
+
+      <!-- after 256 -->
+      <div class="srow">
+        <div class="lab"><b>+256</b>merge t·h</div>
+        <div class="seq">
+          <span class="pairmark"><span class="tok merge">th</span><span class="tok byte">e</span></span>
+          <span class="tok byte">␣</span>
+          <span class="tok merge">th</span><span class="tok byte">e</span><span class="tok byte">␣</span>
+          <span class="tok merge">th</span><span class="tok byte">e</span><span class="tok byte">n</span>
+        </div>
+        <div class="cnt"><span class="n">9</span><div class="l">tokens</div></div>
+      </div>
+
+      <!-- after 257 -->
+      <div class="srow">
+        <div class="lab"><b>+257</b>merge th·e</div>
+        <div class="seq">
+          <span class="pairmark"><span class="tok merge">the</span><span class="tok byte">␣</span></span>
+          <span class="tok merge">the</span><span class="tok byte">␣</span>
+          <span class="tok merge">the</span><span class="tok byte">n</span>
+        </div>
+        <div class="cnt"><span class="n">6</span><div class="l">tokens</div></div>
+      </div>
+
+      <!-- final -->
+      <div class="srow final">
+        <div class="lab"><b>+258</b>merge the·␣</div>
+        <div class="seq">
+          <span class="tok merge">the␣<span class="id">258</span></span>
+          <span class="tok merge">the␣<span class="id">258</span></span>
+          <span class="tok merge">the<span class="id">257</span></span>
+          <span class="tok byte">n</span>
+        </div>
+        <div class="cnt hot"><span class="n">4</span><div class="l">tokens</div></div>
+      </div>
+    </div>
+
+    <div class="payoff">
+      <div class="callout">
+        <span class="lead">THE PAYOFF</span>
+        <span class="txt">Frequent sequences collapse to <b>one token</b> · rare words fall back to <b>subwords</b> · nothing is ever <b>UNK</b>. Same loop, 50,000 merges over real text = GPT-2's vocabulary.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="figfoot">
+    <div class="brand">FIG. 2 — 3 MERGES: <span class="hot">12 → 4 TOKENS</span>, VOCAB +3 · GPT-2 DOES THIS <span class="hot">50,000×</span></div>
+    <div class="brand">SOURCE: STANFORD CS336 L1 · DIAGRAM: @SUSHANT_P18</div>
+  </div>
+</body></html>

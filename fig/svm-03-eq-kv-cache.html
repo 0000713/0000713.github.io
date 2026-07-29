@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<meta name="figure-height" content="430">
+<link rel="stylesheet" href="style/distill-style.css">
+<style>
+  .wrap { display:grid; grid-template-columns:1fr 300px; gap:46px; align-items:start; margin-top:8px; }
+
+  .eqline { display:flex; align-items:flex-start; gap:9px; margin-top:6px; }
+  .lhs { font-family:var(--mono); font-size:24px; color:var(--ink); padding-top:1px; }
+  .lhs sub { font-size:11px; color:var(--label); }
+  .eqop { font-family:var(--mono); font-size:24px; color:var(--faint); padding-top:1px; }
+  .tm { display:flex; flex-direction:column; align-items:center; min-width:38px; }
+  .tm .sym { font-family:var(--mono); font-size:24px; color:var(--ink); }
+  .tm .sym sub { font-size:11px; color:var(--label); }
+  .tm .tie { width:100%; height:5px; border:1px solid var(--rule); border-top:none; margin-top:7px; }
+  .tm .nm { font-size:9.5px; color:var(--label); margin-top:6px; white-space:nowrap; text-align:center; }
+  .tm .val { font-family:var(--mono); font-size:12.5px; color:var(--warm); margin-top:4px; }
+
+  .sub2 { font-family:var(--mono); font-size:13px; color:var(--body); margin-top:30px; }
+  .sub2 .r { color:var(--ink); font-weight:700; }
+  .res { font-family:var(--mono); font-size:26px; font-weight:700; color:var(--warm); margin-top:9px; letter-spacing:-.5px; }
+  .res .u { font-size:13px; color:var(--label); font-weight:400; letter-spacing:0; }
+
+  .scale { border-left:1px solid var(--rule); padding-left:28px; }
+  .sr { margin-bottom:19px; }
+  .sr .k { font-size:10px; color:var(--label); }
+  .sr .v { font-family:var(--mono); font-size:19px; font-weight:700; margin-top:4px; }
+  .sr .v.hi { color:var(--warm); }
+  .sr .g { font-size:10.5px; color:var(--faint); margin-top:3px; line-height:1.4; }
+</style></head>
+<body>
+  <div class="fig-title">The memory price of one cached token
+    <span class="sub">— fixed by the architecture, paid once per token in the sequence</span></div>
+
+  <div class="wrap">
+    <div>
+      <div class="eqline">
+        <span class="lhs">M<sub>kv</sub></span><span class="eqop">=</span>
+        <div class="tm"><span class="sym">2</span><div class="tie"></div>
+          <div class="nm">keys + values</div><div class="val">2</div></div>
+        <span class="eqop">·</span>
+        <div class="tm"><span class="sym">L</span><div class="tie"></div>
+          <div class="nm">layers</div><div class="val">28</div></div>
+        <span class="eqop">·</span>
+        <div class="tm"><span class="sym">H<sub>kv</sub></span><div class="tie"></div>
+          <div class="nm">kv heads</div><div class="val">8</div></div>
+        <span class="eqop">·</span>
+        <div class="tm"><span class="sym">d<sub>head</sub></span><div class="tie"></div>
+          <div class="nm">head dim</div><div class="val">128</div></div>
+        <span class="eqop">·</span>
+        <div class="tm"><span class="sym">b</span><div class="tie"></div>
+          <div class="nm">bytes / element</div><div class="val">2 · bf16</div></div>
+      </div>
+
+      <div class="sub2">2 · 28 · 8 · 128 · 2  =  <span class="r">114,688 bytes</span></div>
+      <div class="res">112 KiB <span class="u">per token</span></div>
+    </div>
+
+    <div class="scale">
+      <div class="sr">
+        <div class="k">the full 8,192-token window</div>
+        <div class="v">896 MiB</div>
+        <div class="g">one sequence, batch size 1</div>
+      </div>
+      <div class="sr">
+        <div class="k">a 1,000-word Hindi prompt, Sarvam-1</div>
+        <div class="v hi">153–230 MiB</div>
+        <div class="g">1,400–2,100 tokens</div>
+      </div>
+      <div class="sr">
+        <div class="k">the same prompt at 4–8 tokens per word</div>
+        <div class="v">438–875 MiB</div>
+        <div class="g">4,000–8,000 tokens — same sentences</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="caption">
+    <b>Cache memory is charged per token, never per word.</b> So fragmentation is not only a longer sequence —
+    it is a larger resident footprint for identical content, which is what decides
+    <span class="hi">how many requests fit on one GPU</span>.
+  </div>
+  <div class="credit">Derived from the published Sarvam-1 config.json<span class="sep">·</span>@sushant_p18</div>
+</body></html>

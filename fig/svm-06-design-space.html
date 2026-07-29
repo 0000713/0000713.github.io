@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<meta name="figure-height" content="520">
+<link rel="stylesheet" href="style/distill-style.css">
+<style>
+  .phrase { display:flex; align-items:baseline; gap:14px; margin-top:4px; margin-bottom:28px; }
+  .phrase .p { font-size:22px; color:var(--ink); }
+  .phrase .g { font-size:11px; color:var(--label); }
+
+  .att { display:grid; grid-template-columns:104px 1fr; gap:12px; align-items:start; margin-bottom:22px; }
+  .att .who { padding-top:5px; }
+  .att .who .n { font-size:12.5px; font-weight:600; color:var(--ink); }
+  .att .who .v { font-family:var(--mono); font-size:10px; color:var(--label); margin-top:3px; }
+  .seq { display:flex; flex-wrap:wrap; gap:2px; align-items:center; }
+  .u { display:inline-flex; align-items:center; justify-content:center; height:25px;
+       border:1px solid var(--cell); font-family:var(--mono); font-size:12px; color:var(--body);
+       min-width:24px; padding:0 5px; background:var(--paper); }
+  .u.byte { min-width:17px; height:21px; padding:0 2px; font-size:8px; color:var(--faint); }
+  .u.win  { background:var(--warm-fill); border-color:var(--warm-line); color:var(--warm); }
+  .u.chr  { min-width:21px; }
+  .cnt { font-family:var(--mono); font-size:11px; color:var(--label); margin-left:10px; white-space:nowrap; }
+  .cnt b { color:var(--ink); font-size:12.5px; }
+  .cnt.hi b { color:var(--warm); }
+  .cnt.bad b { color:var(--flag); }
+
+  .verdict { font-size:11px; color:var(--label); margin-top:6px; line-height:1.45; }
+  .verdict b { color:var(--body); font-weight:600; }
+</style></head>
+<body>
+  <div class="fig-title">The same three words, sliced four ways
+    <span class="sub">— each row is what the model would actually receive</span></div>
+
+  <div class="phrase">
+    <span class="p">नई शिक्षा नीति</span>
+    <span class="g">“new education policy” · 3 words · 14 characters · 38 UTF-8 bytes</span>
+  </div>
+
+  <!-- WORD -->
+  <div class="att">
+    <div class="who"><div class="n">Word</div><div class="v">vocabulary ∞</div></div>
+    <div>
+      <div class="seq">
+        <span class="u">नई</span><span class="u">शिक्षा</span><span class="u">नीति</span>
+        <span class="cnt"><b>3</b> tokens</span>
+      </div>
+      <div class="verdict">Shortest possible sequence — but any word never seen before becomes a
+        single <b>unknown</b> token, and that loss is permanent.</div>
+    </div>
+  </div>
+
+  <!-- CHARACTER -->
+  <div class="att">
+    <div class="who"><div class="n">Character</div><div class="v">vocabulary ~150,000</div></div>
+    <div>
+      <div class="seq">
+        <span class="u chr">न</span><span class="u chr">ई</span><span class="u chr">␣</span>
+        <span class="u chr">श</span><span class="u chr">ि</span><span class="u chr">क</span><span class="u chr">्</span>
+        <span class="u chr">ष</span><span class="u chr">ा</span><span class="u chr">␣</span>
+        <span class="u chr">न</span><span class="u chr">ी</span><span class="u chr">त</span><span class="u chr">ि</span>
+        <span class="cnt"><b>14</b> tokens</span>
+      </div>
+      <div class="verdict">Nothing is ever unknown — but one row of the embedding table is spent on
+        every code point in Unicode, most of which never appear.</div>
+    </div>
+  </div>
+
+  <!-- BYTE -->
+  <div class="att">
+    <div class="who"><div class="n">Byte</div><div class="v">vocabulary 256</div></div>
+    <div>
+      <div class="seq">
+        <span class="u byte">e0</span><span class="u byte">a4</span><span class="u byte">a8</span><span class="u byte">e0</span><span class="u byte">a4</span><span class="u byte">88</span><span class="u byte">20</span><span class="u byte">e0</span><span class="u byte">a4</span><span class="u byte">b6</span><span class="u byte">e0</span><span class="u byte">a4</span><span class="u byte">bf</span><span class="u byte">e0</span><span class="u byte">a4</span><span class="u byte">95</span><span class="u byte">e0</span><span class="u byte">a5</span><span class="u byte">8d</span><span class="u byte">e0</span><span class="u byte">a4</span><span class="u byte">b7</span><span class="u byte">e0</span><span class="u byte">a4</span><span class="u byte">be</span><span class="u byte">20</span><span class="u byte">e0</span><span class="u byte">a4</span><span class="u byte">a8</span><span class="u byte">e0</span><span class="u byte">a5</span><span class="u byte">80</span><span class="u byte">e0</span><span class="u byte">a4</span><span class="u byte">a4</span><span class="u byte">e0</span><span class="u byte">a4</span><span class="u byte">bf</span>
+        <span class="cnt bad"><b>38</b> tokens</span>
+      </div>
+      <div class="verdict">The most closed vocabulary there is, and the longest sequence. Devanagari
+        takes <b>three bytes per character</b> where Latin takes one — the gap starts here, before any
+        design decision is made.</div>
+    </div>
+  </div>
+
+  <!-- SUBWORD -->
+  <div class="att">
+    <div class="who"><div class="n">Subword</div><div class="v">vocabulary 68,096</div></div>
+    <div>
+      <div class="seq">
+        <span class="u win">▁नई</span><span class="u win">▁शिक्षा</span><span class="u win">▁नीति</span>
+        <span class="cnt hi"><b>3</b> tokens</span>
+      </div>
+      <div class="verdict">A bounded vocabulary <b>and</b> a short sequence — because these three pieces
+        were <b>learned from a corpus</b> rather than fixed by a rule. Which is the catch: whichever corpus
+        it learned from.</div>
+    </div>
+  </div>
+
+  <div class="caption">
+    <b>Every fixed rule buys one goal by giving up the other.</b> Word tokenization has the shortest sequence
+    and an unbounded vocabulary; byte tokenization has the smallest vocabulary and the longest sequence.
+    Only the learned option gets <span class="hi">both</span> — and it pays for that by inheriting the
+    statistics of whatever text it was trained on.
+  </div>
+  <div class="credit">Sequences produced with the Sarvam-1 tokenizer<span class="sep">·</span>@sushant_p18</div>
+</body></html>

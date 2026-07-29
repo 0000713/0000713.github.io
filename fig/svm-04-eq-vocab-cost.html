@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<meta name="figure-height" content="440">
+<link rel="stylesheet" href="style/distill-style.css">
+<style>
+  .wrap { display:grid; grid-template-columns:1fr 330px; gap:46px; align-items:start; margin-top:8px; }
+
+  .eqline { display:flex; align-items:flex-start; gap:11px; margin-top:6px; }
+  .lhs { font-family:var(--mono); font-size:24px; color:var(--ink); padding-top:1px; }
+  .lhs sub { font-size:11px; color:var(--label); }
+  .eqop { font-family:var(--mono); font-size:24px; color:var(--faint); padding-top:1px; }
+  .tm { display:flex; flex-direction:column; align-items:center; min-width:44px; }
+  .tm .sym { font-family:var(--mono); font-size:24px; color:var(--ink); }
+  .tm .tie { width:100%; height:5px; border:1px solid var(--rule); border-top:none; margin-top:7px; }
+  .tm .nm { font-size:9.5px; color:var(--label); margin-top:6px; white-space:nowrap; }
+  .tm .val { font-family:var(--mono); font-size:12.5px; color:var(--warm); margin-top:4px; }
+
+  .sub2 { font-family:var(--mono); font-size:13px; color:var(--body); margin-top:30px; }
+  .res { font-family:var(--mono); font-size:26px; font-weight:700; color:var(--warm); margin-top:9px; letter-spacing:-.5px; }
+  .res .u { font-size:13px; color:var(--label); font-weight:400; letter-spacing:0; }
+
+  .why { border-left:1px solid var(--rule); padding-left:28px; }
+  .why .k { font-size:10px; color:var(--label); margin-bottom:8px; }
+  .why .t { font-family:var(--serif); font-size:12.5px; line-height:1.6; color:var(--body); }
+  .why .t b { color:var(--ink); }
+  .why .cfg { font-family:var(--mono); font-size:11.5px; color:var(--warm);
+    background:var(--warm-fill); padding:2px 6px; border:1px solid var(--warm-line); white-space:nowrap; }
+
+  /* the share of the model, drawn rather than stated */
+  .share { margin-top:26px; }
+  .share .k { font-size:10px; color:var(--label); margin-bottom:8px; }
+  .sbar { display:flex; height:26px; border:1px solid var(--cell); }
+  .sbar .emb { background:var(--warm-fill); border-right:1px solid var(--warm-line);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:10px; color:var(--warm); }
+  .sbar .rest { flex:1; background:var(--cell-bg); display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:10px; color:var(--label); }
+</style></head>
+<body>
+  <div class="fig-title">What a large vocabulary costs in parameters
+    <span class="sub">— the counterweight to low fertility</span></div>
+
+  <div class="wrap">
+    <div>
+      <div class="eqline">
+        <span class="lhs">P<sub>emb</sub></span><span class="eqop">=</span>
+        <div class="tm"><span class="sym">V</span><div class="tie"></div>
+          <div class="nm">vocabulary</div><div class="val">68,096</div></div>
+        <span class="eqop">×</span>
+        <div class="tm"><span class="sym">d</span><div class="tie"></div>
+          <div class="nm">hidden size</div><div class="val">2,048</div></div>
+        <span class="eqop">×</span>
+        <div class="tm"><span class="sym">n</span><div class="tie"></div>
+          <div class="nm">matrices</div><div class="val">2</div></div>
+      </div>
+
+      <div class="sub2">68,096 × 2,048 × 2  =  278,921,216</div>
+      <div class="res">278.9M <span class="u">parameters, on representation alone</span></div>
+
+      <div class="share">
+        <div class="k">as a share of the whole model</div>
+        <div class="sbar">
+          <div class="emb" style="width:11%">11%</div>
+          <div class="rest">the other ~2.24B parameters — layers, attention, MLP</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="why">
+      <div class="k">why n is 2, and not 1</div>
+      <div class="t">The vocabulary is charged once on the way in and once on the way out — the input
+        embedding table and the output projection are <b>separate matrices</b>.
+        <br><br>
+        Sarvam's write-up does not say whether they share weights. The shipped config does:
+        <br><br>
+        <span class="cfg">tie_word_embeddings: false</span>
+        <br><br>
+        Untied. So <b>two</b> matrices of 139.5M each, not one.</div>
+    </div>
+  </div>
+
+  <div class="caption">
+    <b>Low fertility is bought, not free.</b> Shorter sequences are paid for in embedding parameters, and at
+    this vocabulary size the bill is <span class="hi">about a ninth of the entire model</span>. The trade
+    that appeared in the very first design attempt never disappears — it only moves.
+  </div>
+  <div class="credit">Read from the published Sarvam-1 config.json<span class="sep">·</span>@sushant_p18</div>
+</body></html>

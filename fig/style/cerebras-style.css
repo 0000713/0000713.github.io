@@ -1,0 +1,240 @@
+/* ============================================================================
+   HOUSE DIAGRAM STYLE — "engineering blog figure"  (v2)
+   Aesthetic: Cerebras-inspired. Warm paper, near-black ink, single orange
+   accent, disciplined monospace labels. Restraint is the whole point —
+   differentiate by weight and label, add hue only when a comparison needs it.
+
+   Canvas: 1200 x 675 CSS px. Render at 2x → 2400 x 1350 PNG (see render.sh).
+   Every figure = .figbar (top) + .stage (middle) + .figfoot (bottom).
+   Backward compatible with v1 figures; v2 adds tokens, stats, legends, callouts.
+   ============================================================================ */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  /* --- surfaces --- */
+  --bg: #faf9f7;            /* warm off-white page */
+  --panel: #ffffff;         /* figure panels */
+  --panel-2: #f6f4f0;       /* recessed / secondary panel */
+  --ink: #14120f;           /* near-black text + emphasis */
+  --ink-soft: #57524a;      /* body text on paper */
+  --muted: #8a857c;         /* secondary / captions */
+  --hairline: #e6e2da;      /* borders */
+  --grid: #efece5;          /* dot-grid texture */
+
+  /* --- accent (primary: orange) --- */
+  --accent: #f15a24;
+  --accent-soft: #fdeee6;   /* orange tint fill */
+  --accent-line: #f6b699;   /* orange hairline */
+
+  /* --- secondary accent (cool) — use ONLY for 2-way contrast --- */
+  --cool: #2f6f8f;
+  --cool-soft: #e8f0f4;
+  --cool-line: #a9c9d6;
+
+  /* --- states --- */
+  --penal: #b8b2a7;         /* penalized / struck-through */
+  --good: #3f7d4e;          /* pass / winner text */
+  --danger: #c0362c;        /* broken / glitch */
+
+  /* --- shadow: barely-there lift off the paper --- */
+  --shadow: 0 1px 2px rgba(20,18,15,.045), 0 10px 26px rgba(20,18,15,.05);
+  --shadow-sm: 0 1px 2px rgba(20,18,15,.05);
+
+  --mono: "SF Mono", ui-monospace, "JetBrains Mono", Menlo, monospace;
+  --sans: -apple-system, "Helvetica Neue", "Inter", Arial, sans-serif;
+}
+
+html, body { width: 1200px; height: 675px; overflow: hidden; }
+body {
+  background-color: var(--bg);
+  /* faint engineering dot-grid — reads only in the margins, sits behind panels */
+  background-image: radial-gradient(var(--grid) 1.15px, transparent 1.15px);
+  background-size: 22px 22px;
+  background-position: -11px -11px;
+  font-family: var(--sans);
+  color: var(--ink);
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+}
+
+/* --- header bar ----------------------------------------------------------- */
+.figbar { display: flex; justify-content: space-between; align-items: baseline; padding: 26px 44px 0; }
+.figbar .l { font-family: var(--mono); font-size: 13px; letter-spacing: 2.5px; font-weight: 700; }
+.figbar .l .dim { color: var(--muted); font-weight: 400; }
+.figbar .r {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 2px; color: var(--accent); font-weight: 700;
+  border: 1.5px solid var(--accent); border-radius: 99px; padding: 5px 14px;
+}
+/* accent tick under the title — small v2 flourish */
+.figbar .l::before {
+  content: ""; display: inline-block; width: 22px; height: 3px; background: var(--accent);
+  border-radius: 2px; margin-right: 12px; vertical-align: middle; transform: translateY(-2px);
+}
+
+/* --- stage: the working area --------------------------------------------- */
+.stage { position: absolute; top: 74px; left: 44px; right: 44px; bottom: 64px; }
+
+/* --- micro label ---------------------------------------------------------- */
+.micro { font-family: var(--mono); font-size: 10.5px; letter-spacing: 1.8px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+.micro.hot { color: var(--accent); }
+
+/* --- panels --------------------------------------------------------------- */
+.panel { background: var(--panel); border: 1.5px solid var(--hairline); border-radius: 10px; box-shadow: var(--shadow-sm); }
+.panel.raised { box-shadow: var(--shadow); }
+.panel.recess { background: var(--panel-2); box-shadow: none; }
+.panel.ink    { background: var(--ink); border-color: var(--ink); color: #f4f2ee; box-shadow: var(--shadow); }
+.panel.ink .micro { color: #b7b1a6; }
+.panel.win    { border: 2px solid var(--accent); box-shadow: 0 0 0 4px var(--accent-soft), var(--shadow); }
+
+/* --- chips (existing) ----------------------------------------------------- */
+.chip { display: inline-block; font-family: var(--mono); font-size: 9.5px; font-weight: 700; letter-spacing: 1.2px;
+  padding: 4px 9px 3px; border-radius: 4px; text-transform: uppercase; vertical-align: middle; }
+.chip.boost   { background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent-line); }
+.chip.cool    { background: var(--cool-soft);   color: var(--cool);   border: 1px solid var(--cool-line); }
+.chip.penal   { background: #f1efeb; color: var(--penal); border: 1px solid var(--hairline); text-decoration: line-through; }
+.chip.neutral { background: #f4f2ee; color: #6d675e; border: 1px solid var(--hairline); }
+.chip.good    { background: #eaf3ec; color: var(--good); border: 1px solid #bcd8c2; }
+.chip.danger  { background: #f8e9e7; color: var(--danger); border: 1px solid #e6bab5; }
+
+/* --- token pills (v2) — for tokenization / sequence figures --------------- */
+/* .tok = one token. Use --space to show a leading-space token as ▁. */
+.tok {
+  display: inline-flex; align-items: center; font-family: var(--mono); font-size: 13px; font-weight: 600;
+  line-height: 1; padding: 7px 9px; border-radius: 6px; border: 1.5px solid var(--hairline);
+  background: var(--panel); color: var(--ink); box-shadow: var(--shadow-sm); white-space: pre;
+}
+.tok.byte  { background: var(--panel-2); color: var(--ink-soft); font-size: 11.5px; padding: 6px 7px; }
+.tok.char  { background: var(--cool-soft); border-color: var(--cool-line); color: var(--cool); }
+.tok.word  { background: #f4f2ee; border-color: var(--hairline); }
+.tok.merge { background: var(--accent-soft); border-color: var(--accent-line); color: var(--accent); }
+.tok.glitch{ background: repeating-linear-gradient(45deg,#f8e9e7,#f8e9e7 6px,#fbf1f0 6px,#fbf1f0 12px);
+             border: 1.5px dashed var(--danger); color: var(--danger); }
+.tok .id   { font-size: 9.5px; color: var(--muted); margin-left: 7px; font-weight: 700; }
+.tok.merge .id { color: var(--accent); }
+/* the leading-space glyph convention (GPT-2 "Ġ" shown as ▁) */
+.spc { color: var(--accent); font-weight: 700; }
+
+/* --- stat block (v2) — big numbers, e.g. compression ratio ---------------- */
+.stat { text-align: left; }
+.stat .num { font-family: var(--mono); font-weight: 700; font-size: 40px; letter-spacing: -1.5px; line-height: .95; color: var(--ink); }
+.stat .num .unit { font-size: 16px; color: var(--muted); letter-spacing: 0; margin-left: 4px; }
+.stat.hot .num { color: var(--accent); }
+.stat .cap { font-family: var(--mono); font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+
+/* --- mini bar (v2) — proportional bar for a ratio ------------------------- */
+.bar { height: 8px; border-radius: 99px; background: var(--panel-2); overflow: hidden; border: 1px solid var(--hairline); }
+.bar > span { display: block; height: 100%; background: var(--penal); }
+.bar.hot > span { background: var(--accent); }
+.bar.cool > span { background: var(--cool); }
+
+/* --- legend (v2) ---------------------------------------------------------- */
+.legend { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+.legend .item { display: flex; align-items: center; gap: 7px; font-family: var(--mono); font-size: 11px; color: var(--ink-soft); }
+.legend .swatch { width: 12px; height: 12px; border-radius: 3px; border: 1.5px solid var(--hairline); display: inline-block; }
+
+/* --- numbered step badge (v2, generalized from v1 .step .n) --------------- */
+.stepno { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 1px; color: #fff;
+  background: var(--ink); border-radius: 4px; padding: 2px 7px; }
+.stepno.hot { background: var(--accent); }
+
+/* --- callout (v2) — the takeaway, dark panel with light text -------------- */
+.callout { background: var(--ink); color: #f4f2ee; border-radius: 10px; padding: 16px 20px; box-shadow: var(--shadow); }
+.callout b { color: #fff; }
+.callout .lead { color: var(--accent); font-family: var(--mono); font-size: 10px; letter-spacing: 1.8px; text-transform: uppercase; display: block; margin-bottom: 7px; }
+
+/* --- equations (v3) ------------------------------------------------------- */
+/* An equation figure: the expression, each symbol annotated with its meaning
+   AND its substituted value, then the landed result. X Articles have no math
+   renderer, so display equations ship as figures — this is that primitive.
+   Structure:
+     <div class="eq">
+       <div class="eqrow">
+         <span class="lhs">M<sub>kv</sub></span><span class="op">=</span>
+         <div class="term"><span class="sym">2</span>
+              <span class="brace"></span>
+              <span class="nm">K + V</span><span class="val">2</span></div>
+         <span class="op">·</span>  … more terms …
+       </div>
+       <div class="eqres">= <b>114,688 bytes</b> <span class="dim">→</span> 112 KiB / token</div>
+     </div>                                                                  */
+.eq { display: flex; flex-direction: column; gap: 22px; }
+
+.eqrow { display: flex; align-items: flex-start; justify-content: center; gap: 10px; }
+
+/* the left-hand side and the operators sit on the symbol baseline */
+.eqrow .lhs, .eqrow .op {
+  font-family: var(--mono); font-size: 30px; font-weight: 700; line-height: 1.05;
+  letter-spacing: -.5px; color: var(--ink); align-self: flex-start; white-space: pre;
+}
+.eqrow .op  { color: var(--muted); font-weight: 400; }
+.eqrow .lhs sub { font-size: 14px; color: var(--muted); font-weight: 600; letter-spacing: 0; }
+
+/* one annotated symbol: glyph → brace → name → value */
+.term { display: flex; flex-direction: column; align-items: center; min-width: 46px; }
+.term .sym {
+  font-family: var(--mono); font-size: 30px; font-weight: 700; line-height: 1.05;
+  letter-spacing: -.5px; color: var(--ink); white-space: pre;
+}
+.term .sym sub { font-size: 14px; color: var(--muted); font-weight: 600; letter-spacing: 0; }
+/* the little downward bracket under the symbol */
+.term .brace {
+  display: block; width: 100%; height: 9px; margin-top: 9px;
+  border: 1.5px solid var(--accent-line); border-top: none; border-radius: 0 0 5px 5px;
+}
+.term .nm {
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: 1.2px; text-transform: uppercase;
+  color: var(--muted); font-weight: 700; margin-top: 8px; text-align: center; white-space: nowrap;
+}
+.term .val {
+  font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--accent);
+  margin-top: 5px; white-space: nowrap;
+}
+/* .term.dim — a symbol that is NOT the story (grey brace + grey value) */
+.term.dim .brace { border-color: var(--hairline); }
+.term.dim .val   { color: var(--ink-soft); }
+
+/* the landed result — always show it, always with units */
+.eqres {
+  align-self: center; font-family: var(--mono); font-size: 17px; color: var(--ink-soft);
+  background: var(--panel-2); border: 1.5px solid var(--hairline); border-radius: 8px;
+  padding: 11px 20px; white-space: pre;
+}
+.eqres b { color: var(--accent); font-size: 19px; }
+
+/* .where — the symbol glossary, when a figure needs definitions spelled out */
+.where { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; align-items: baseline; }
+.where dt { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--ink); }
+.where dd { font-family: var(--sans); font-size: 12.5px; color: var(--ink-soft); }
+
+/* --- arrows / wires ------------------------------------------------------- */
+.arrow { position: absolute; }
+.arrow line, .arrow path { stroke: #c9c3b8; stroke-width: 2; fill: none; }
+.arrow .head { fill: #c9c3b8; stroke: none; }
+.arrow.hot line, .arrow.hot path { stroke: var(--accent); }
+.arrow.hot .head { fill: var(--accent); }
+svg.wires { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+svg.wires path  { stroke: #c9c3b8; stroke-width: 2; fill: none; }
+svg.wires path.hot { stroke: var(--accent); }
+svg.wires path.cool { stroke: var(--cool); }
+svg.wires path.dash { stroke-dasharray: 5 5; }
+svg.wires polygon { fill: #c9c3b8; }
+svg.wires polygon.hot  { fill: var(--accent); }
+svg.wires polygon.cool { fill: var(--cool); }
+
+/* --- code / kbd ----------------------------------------------------------- */
+.code { font-family: var(--mono); background: #f4f2ee; border: 1px solid var(--hairline); border-radius: 4px; padding: 1px 6px; font-size: 12px; }
+
+/* --- footer strip --------------------------------------------------------- */
+.figfoot { position: absolute; left: 44px; right: 44px; bottom: 20px; display: flex; justify-content: space-between; align-items: center;
+  border-top: 1.5px solid var(--hairline); padding-top: 12px; }
+.figfoot .brand { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; color: var(--muted); }
+.figfoot .brand .hot { color: var(--accent); }
+
+/* --- small utilities ------------------------------------------------------ */
+.center { text-align: center; }
+.mono { font-family: var(--mono); }
+.dim  { color: var(--muted); }
+.hot  { color: var(--accent); }
+.strike { text-decoration: line-through; color: var(--penal); }

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<meta name="figure-height" content="760">
+<link rel="stylesheet" href="style/distill-style.css">
+<style>
+  .sheet { display:grid; grid-template-columns:150px 1fr; gap:26px 30px; align-items:start; }
+  .k { font-family:var(--mono); font-size:10px; letter-spacing:1.1px; text-transform:uppercase;
+       color:var(--label); padding-top:7px; }
+  .k i { display:block; font-style:normal; color:var(--faint); letter-spacing:0;
+         text-transform:none; font-size:10px; margin-top:3px; }
+  .d { display:flex; align-items:center; gap:11px; flex-wrap:wrap; }
+  .rule { grid-column:1/-1; height:1px; background:var(--rule); }
+</style></head>
+<body>
+  <div class="fig-title">Architecture primitives, in the house palette
+    <span class="sub">— cool is the structural hum, rust marks the one thing that matters, violet is the third voice</span></div>
+
+  <div class="sheet">
+
+    <div class="k">.op<i>operation block</i></div>
+    <div class="d">
+      <span class="op">RMSNorm</span>
+      <span class="op">MoE / FFN</span>
+      <span class="op warm">Softmax</span>
+      <span class="op viol">Mask</span>
+      <span class="op q">Scale</span>
+      <span class="op solid">Linear</span>
+      <span class="op solid warm">Matmul</span>
+      <span class="op sm">small</span>
+    </div>
+
+    <div class="rule"></div>
+
+    <div class="k">.stack<i>N identical copies</i></div>
+    <div class="d">
+      <span class="stack"><span class="op top">MHA</span></span>
+      <span class="lbl" style="margin-left:16px">multi-head attention — depth without drawing every head</span>
+    </div>
+
+    <div class="rule"></div>
+
+    <div class="k">.vec<i>bracketed column</i></div>
+    <div class="d">
+      <div class="vecrow">
+        <span class="vec"><span>-0.1</span><span>0.4</span><span>0.9</span><span class="dots">⋮</span></span>
+        <span class="vec"><span>0.7</span><span>0.2</span><span>0.5</span><span class="dots">⋮</span></span>
+        <span class="vec warm"><span>-0.2</span><span>0.3</span><span>0.6</span><span class="dots">⋮</span></span>
+        <span class="vec q"><span>0.5</span><span>0.8</span><span>0.8</span><span class="dots">⋮</span></span>
+        <span class="ell">…</span>
+      </div>
+    </div>
+
+    <div class="rule"></div>
+
+    <div class="k">.hm<i>heatmap grid</i></div>
+    <div class="d" style="align-items:flex-start; gap:34px">
+      <div>
+        <div class="hm bordered" style="grid-template-columns:repeat(4,26px); width:110px">
+          <div class="c" style="background:#4a7ba7"></div><div class="c" style="background:#f4f8fb"></div><div class="c" style="background:#f4f8fb"></div><div class="c" style="background:#f4f8fb"></div>
+          <div class="c" style="background:#c9dbe9"></div><div class="c" style="background:#4a7ba7"></div><div class="c" style="background:#f4f8fb"></div><div class="c" style="background:#f4f8fb"></div>
+          <div class="c" style="background:#e2ecf4"></div><div class="c" style="background:#a5c3da"></div><div class="c" style="background:#4a7ba7"></div><div class="c" style="background:#f4f8fb"></div>
+          <div class="c" style="background:#e2ecf4"></div><div class="c" style="background:#c9dbe9"></div><div class="c" style="background:#7ca6ca"></div><div class="c" style="background:#4a7ba7"></div>
+        </div>
+        <div class="hm-lbl" style="margin-top:7px">cool ramp — causal attention</div>
+      </div>
+      <div>
+        <div class="hm bordered" style="grid-template-columns:repeat(6,17px); width:110px">
+          <div class="c" style="background:#f9e7db"></div><div class="c" style="background:#e6aa85"></div><div class="c" style="background:#fdf7f3"></div><div class="c" style="background:#d67c4a"></div><div class="c" style="background:#f2ceb7"></div><div class="c" style="background:#fdf7f3"></div>
+          <div class="c" style="background:#c1440e"></div><div class="c" style="background:#f2ceb7"></div><div class="c" style="background:#e6aa85"></div><div class="c" style="background:#f9e7db"></div><div class="c" style="background:#fdf7f3"></div><div class="c" style="background:#d67c4a"></div>
+          <div class="c" style="background:#f2ceb7"></div><div class="c" style="background:#fdf7f3"></div><div class="c" style="background:#d67c4a"></div><div class="c" style="background:#e6aa85"></div><div class="c" style="background:#c1440e"></div><div class="c" style="background:#f9e7db"></div>
+          <div class="c" style="background:#fdf7f3"></div><div class="c" style="background:#d67c4a"></div><div class="c" style="background:#f9e7db"></div><div class="c" style="background:#f2ceb7"></div><div class="c" style="background:#e6aa85"></div><div class="c" style="background:#fdf7f3"></div>
+        </div>
+        <div class="hm-lbl" style="margin-top:7px">warm ramp — image patches</div>
+      </div>
+    </div>
+
+    <div class="rule"></div>
+
+    <div class="k">.tspan<i>tinted token text</i></div>
+    <div class="d">
+      <span class="tokline"><span class="tspan" style="background:#dbe6f0">The</span><span class="tspan" style="background:#e3eef4">&nbsp;blue</span><span class="tspan" style="background:#dcefee">&nbsp;whale</span><span class="tspan" style="background:#e0f0e6">&nbsp;is</span><span class="tspan" style="background:#f6efd9">&nbsp;a</span><span class="tspan" style="background:#f8e4d6">&nbsp;massive</span><span class="tspan" style="background:#f7dcd4">&nbsp;creature.</span></span>
+    </div>
+
+    <div class="rule"></div>
+
+    <div class="k">.plus / .blk<i>residual, enclosure</i></div>
+    <div class="d">
+      <div class="blk" style="width:250px">
+        <div class="tag">transformer block  × n</div>
+        <div style="display:flex; align-items:center; gap:10px">
+          <span class="plus">⊕</span>
+          <span class="op sm wide">MoE / FFN</span>
+          <span class="plus">⊕</span>
+          <span class="op sm q">RMSNorm</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rule"></div>
+
+    <div class="k">.seclabel<i>domain marker</i></div>
+    <div class="d">
+      <span class="seclabel">Language</span>
+      <span class="seclabel warm" style="margin-left:20px">Vision</span>
+    </div>
+
+    <div class="rule"></div>
+
+    <div class="k">svg.lines<i>zoom + elbow arrows</i></div>
+    <div class="d" style="position:relative; height:78px; width:420px">
+      <svg class="lines" viewBox="0 0 420 78">
+        <path class="zoom" d="M96 22 L232 6"/>
+        <path class="zoom" d="M96 52 L232 66"/>
+        <path d="M258 36 H320 a6 6 0 0 0 6 -6 V16" />
+        <polygon points="326,6 322,15 330,15"/>
+      </svg>
+      <span class="op sm" style="position:absolute;left:0;top:26px">source</span>
+      <span class="op sm warm" style="position:absolute;left:236px;top:26px">zoomed</span>
+      <span class="lbl" style="position:absolute;left:336px;top:2px">elbow</span>
+    </div>
+
+  </div>
+
+  <div class="caption">
+    <b>Everything in the reference diagrams is now buildable</b> — operation blocks, stacked depth,
+    bracketed vectors, heatmaps, tinted token text, residual nodes, block enclosures and dashed zoom
+    callouts. The one change is the colour policy: those references are blue throughout, so nothing in
+    them is emphasised. Here <span class="hi">cool carries the structure and rust carries the argument</span>.
+  </div>
+</body></html>

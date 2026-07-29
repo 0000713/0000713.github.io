@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Core LLM - Sushant&#x27;s Open Notebook</title>
+<meta name="description" content="What enters a language model, how tokenization shapes it, and where the costs begin.">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#050505">
+<link rel="canonical" href="https://sushant-97.github.io/core-llm/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Sushant&#x27;s Open Notebook">
+<meta property="og:title" content="Core LLM - Sushant&#x27;s Open Notebook">
+<meta property="og:description" content="What enters a language model, how tokenization shapes it, and where the costs begin.">
+<meta property="og:url" content="https://sushant-97.github.io/core-llm/">
+<meta property="og:image" content="https://sushant-97.github.io/img/social-card.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sushant_p18">
+<meta name="twitter:creator" content="@sushant_p18">
+<meta name="twitter:image" content="https://sushant-97.github.io/img/social-card.jpg">
+
+<!-- The font is discovered inside the stylesheet, which is itself a blocking
+     request - so without this it starts two round trips late and the first paint
+     is in a fallback face. -->
+<link rel="preload" href="/fonts/geist-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/style.css">
+<link rel="alternate" type="application/rss+xml" title="Sushant&#x27;s Open Notebook" href="/rss.xml">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Sushant's Open Notebook","description":"What enters a language model, how tokenization shapes it, and where the costs begin.","url":"https://sushant-97.github.io/core-llm/","author":{"@type":"Person","name":"Sushant Pargaonkar","url":"https://x.com/sushant_p18"}}</script>
+</head>
+<body class="track-page">
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <button class="top-menu" type="button" id="menu-open" aria-label="Open the contents"
+    aria-expanded="false" aria-controls="sidebar"><span></span><span></span><span></span></button>
+  <a class="top-home" href="/"><b>Sushant's</b> Open Notebook</a>
+  <span class="top-where">Track I <i>/</i> Core LLM</span>
+  <button class="top-search" type="button" id="search-open" aria-label="Search the book">
+    <span>Search</span><kbd>&#8984;K</kbd></button>
+  <nav class="top-links" aria-label="Site">
+    <a href="/">Tracks</a><a href="/rss.xml">RSS</a>
+    <a href="https://x.com/sushant_p18">X</a>
+  </nav>
+</header>
+<div class="book">
+  <aside class="sidebar" id="sidebar" aria-label="Core LLM contents">
+  <div class="side-head">
+    <a class="side-back" href="/">&larr; All tracks</a>
+    <button class="side-close" type="button" id="menu-close" aria-label="Close the contents">&times;</button>
+    <a class="side-home" href="/core-llm/">
+      <span class="part-n">Track I</span>
+      Core LLM</a>
+    <div class="side-progress track-meter" data-track="core-llm"><div class="part-bar"><i></i></div><span class="side-count">0/2 read</span></div>
+  </div>
+  <nav class="side-body"><ol class="chapters"><li class="ch" data-chapter="an-llm-has-never-seen-a-letter"><a href="/an-llm-has-never-seen-a-letter/"><span class="ch-num">01</span><span class="ch-title">An LLM has never seen a letter in its life</span><i class="ch-dot" aria-hidden="true"></i></a><button class="ch-mark" type="button" aria-pressed="false" data-bookmark="an-llm-has-never-seen-a-letter" aria-label="Bookmark An LLM has never seen a letter in its life">&#9733;</button></li><li class="ch" data-chapter="hidden-language-tax"><a href="/hidden-language-tax/"><span class="ch-num">02</span><span class="ch-title">The hidden language tax</span><i class="ch-dot" aria-hidden="true"></i></a><button class="ch-mark" type="button" aria-pressed="false" data-bookmark="hidden-language-tax" aria-label="Bookmark The hidden language tax">&#9733;</button></li></ol></nav>
+</aside>
+<div class="scrim" id="scrim" hidden></div>
+  <div class="gutter" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Resize the contents - arrow keys adjust, Home resets"></div>
+  <main id="main" class="book-main">
+    <div class="page">
+      <header class="lede">
+        <p class="kicker"><a href="/">All tracks</a> <i>/</i>
+          <span>Track I</span></p>
+        <h1>Core LLM</h1>
+        <p class="blurb">What enters a language model, how tokenization shapes it, and where the costs begin.</p>
+        <p class="counts"><b>2</b> of <b>2</b> chapters
+          written.</p>
+        <div class="ctas"><a class="cta" href="/an-llm-has-never-seen-a-letter/" id="start-reading"><b>Start reading</b><small>01 &middot; An LLM has never seen a letter in its life</small></a></div>
+      </header>
+      <div class="sec-head">
+        <h2><span class="dim">Chapters in</span> Core LLM</h2>
+        <span class="pill">2/2 written</span>
+      </div>
+      <ol class="rows track-rows"><li class="row" data-chapter="an-llm-has-never-seen-a-letter"><a href="/an-llm-has-never-seen-a-letter/"><span class="row-n">01</span><span class="row-title">An LLM has never seen a letter in its life<small>A visual tour from raw bytes to BPE: how one invisible translation layer sets model cost, context capacity, and many of the bugs that look like model failures.</small></span><span class="row-meta"><i class="ch-dot" aria-hidden="true"></i>Jul 2026<b></b>6 min</span></a></li><li class="row" data-chapter="hidden-language-tax"><a href="/hidden-language-tax/"><span class="row-n">02</span><span class="row-title">The hidden language tax<small>The same 8,192-token window holds roughly 7,600 Hindi words under one tokenizer and about 1,600 under another. The whole difference comes from one small file, written by decisions taken before training began.</small></span><span class="row-meta"><i class="ch-dot" aria-hidden="true"></i>Jul 2026<b></b>24 min</span></a></li></ol>
+      <nav class="pager" aria-label="Track pagination"><a class="next" href="/agent-patterns/"><small>Next track</small><span>Agent Patterns</span></a></nav>
+    </div>
+  </main>
+</div>
+<script type="application/json" id="book-map">[{"slug":"core-llm","chapters":["an-llm-has-never-seen-a-letter","hidden-language-tax"]},{"slug":"agent-patterns","chapters":[]},{"slug":"inference","chapters":[]},{"slug":"machine-learning","chapters":[]},{"slug":"data-analysis","chapters":[]}]</script>
+<div class="find" id="find" hidden>
+  <div class="find-box" role="dialog" aria-modal="true" aria-label="Search the book">
+    <input id="find-input" type="search" autocomplete="off" spellcheck="false"
+      placeholder="Search chapters and sections" aria-label="Search chapters and sections"
+      aria-controls="find-results" aria-expanded="true">
+    <ul class="find-results" id="find-results" role="listbox" aria-label="Results"></ul>
+    <p class="find-foot"><kbd>&uarr;</kbd><kbd>&darr;</kbd> move
+      <kbd>&crarr;</kbd> open <kbd>esc</kbd> close</p>
+  </div>
+</div>
+<script src="/script.js" defer></script>
+</body>
+</html>

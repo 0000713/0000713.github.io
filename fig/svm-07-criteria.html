@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<meta name="figure-height" content="600">
+<link rel="stylesheet" href="style/distill-style.css">
+<style>
+  .three { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0 40px; align-items:start; margin-top:22px; }
+
+  .nm { font-size:14px; font-weight:700; letter-spacing:-.1px; }
+  .prov { font-size:10px; color:var(--label); margin-top:3px; }
+  .does { font-size:11.5px; color:var(--body); margin-top:9px; line-height:1.45; min-height:46px; }
+  .does .k  { color:var(--warm);   font-weight:700; }
+  .does .k2 { color:var(--cool);   font-weight:700; }
+  .does .k3 { color:var(--violet); font-weight:700; }
+
+  /* the corpus, drawn as characters — the object the criteria operate on */
+  .corp { margin-top:6px; }
+  .wrow { display:flex; align-items:center; height:30px; }
+  .ch { position:relative; width:19px; text-align:center; font-family:var(--mono); font-size:14px; color:var(--body); }
+  .ct { width:34px; font-family:var(--mono); font-size:10px; color:var(--faint); text-align:right; margin-left:12px; }
+
+  /* a pair, marked where it occurs: tinted glyphs + a tie beneath them */
+  .pair { position:relative; display:inline-block; }
+  .pair .ch { font-weight:700; }
+  .pair::after { content:""; position:absolute; left:3px; right:3px; bottom:1px; height:5px;
+    border:1px solid currentColor; border-top:none; border-radius:0 0 3px 3px; opacity:.5; }
+  .pair.w { color:var(--warm); }   .pair.w .ch  { color:var(--warm); }
+  .pair.c { color:var(--cool); }   .pair.c .ch  { color:var(--cool); }
+
+  .tally { font-family:var(--mono); font-size:11px; color:var(--body); margin-top:12px; line-height:1.6; }
+  .tally .hi  { color:var(--warm); font-weight:700; }
+  .tally .hi2 { color:var(--cool); font-weight:700; }
+  .tally .g   { color:var(--faint); }
+
+  /* the outcome: the corpus after the merge, with the new token inline */
+  .after { margin-top:16px; padding-top:13px; border-top:1px solid var(--rule); }
+  .after .k { font-size:9.5px; color:var(--faint); margin-bottom:9px; }
+  .arow { display:flex; align-items:center; gap:3px; height:26px; font-family:var(--mono); font-size:12.5px; color:var(--body); }
+  .tok { padding:2px 5px; border:1px solid var(--cell); background:var(--paper); }
+  .tok.w { background:var(--warm-fill);   border-color:var(--warm-line);   color:var(--warm);   font-weight:700; }
+  .tok.c { background:var(--cool-fill);   border-color:var(--cool-line);   color:var(--cool);   font-weight:700; }
+  .tok.v { background:var(--violet-fill); border-color:var(--violet-line); color:var(--violet); font-weight:700; }
+
+  /* unigram: a candidate set being thinned */
+  .pool { display:flex; flex-wrap:wrap; gap:5px; margin-top:6px; max-width:300px; }
+  .cand2 { padding:2px 6px; border:1px solid var(--cell); font-family:var(--mono); font-size:11.5px; color:var(--body); }
+  .cand2.cut { color:var(--faint); border-color:var(--rule); text-decoration:line-through; }
+  .cand2.keep { color:var(--violet); border-color:var(--violet-line); background:var(--violet-fill); font-weight:700; }
+</style></head>
+<body>
+  <div class="fig-title">One merge, three criteria
+    <span class="sub">— the same five words, and what each rule does to them first</span></div>
+
+  <div class="three">
+    <!-- ============ BPE ============ -->
+    <div>
+      <div class="nm">Byte-pair encoding</div>
+      <div class="prov">Sennrich et al., 2015 · GPT, Llama</div>
+      <div class="does">Counts adjacent pairs and merges the <span class="k">most frequent</span> one.</div>
+
+      <div class="corp">
+        <div class="wrow"><span class="ch">h</span><span class="pair w"><span class="ch">u</span><span class="ch">g</span></span><span class="ct">×10</span></div>
+        <div class="wrow"><span class="ch">p</span><span class="pair w"><span class="ch">u</span><span class="ch">g</span></span><span class="ct">×5</span></div>
+        <div class="wrow"><span class="ch">p</span><span class="ch">u</span><span class="ch">n</span><span class="ct">×12</span></div>
+        <div class="wrow"><span class="ch">b</span><span class="ch">u</span><span class="ch">n</span><span class="ct">×4</span></div>
+        <div class="wrow"><span class="ch">h</span><span class="pair w"><span class="ch">u</span><span class="ch">g</span></span><span class="ch">s</span><span class="ct">×5</span></div>
+      </div>
+
+      <div class="tally">u g <span class="g">appears</span> 10+5+5 = <span class="hi">20</span><br>
+        <span class="g">u n appears 16 · h u 15 · g s 5</span></div>
+
+      <div class="after">
+        <div class="k">the corpus after one merge</div>
+        <div class="arow"><span class="tok">h</span><span class="tok w">ug</span></div>
+        <div class="arow"><span class="tok">p</span><span class="tok w">ug</span></div>
+        <div class="arow"><span class="tok">h</span><span class="tok w">ug</span><span class="tok">s</span></div>
+      </div>
+    </div>
+
+    <!-- ============ WORDPIECE ============ -->
+    <div>
+      <div class="nm">WordPiece</div>
+      <div class="prov">Schuster &amp; Nakajima, 2012 · BERT</div>
+      <div class="does">Merges the <span class="k2">most surprising</span> pair — the one that co-occurs far above chance.</div>
+
+      <div class="corp">
+        <div class="wrow"><span class="ch">h</span><span class="ch">u</span><span class="ch">g</span><span class="ct">×10</span></div>
+        <div class="wrow"><span class="ch">p</span><span class="ch">u</span><span class="ch">g</span><span class="ct">×5</span></div>
+        <div class="wrow"><span class="ch">p</span><span class="ch">u</span><span class="ch">n</span><span class="ct">×12</span></div>
+        <div class="wrow"><span class="ch">b</span><span class="ch">u</span><span class="ch">n</span><span class="ct">×4</span></div>
+        <div class="wrow"><span class="ch">h</span><span class="ch">u</span><span class="pair c"><span class="ch">g</span><span class="ch">s</span></span><span class="ct">×5</span></div>
+      </div>
+
+      <div class="tally">g s <span class="g">appears only</span> <span class="hi2">5</span> <span class="g">times —</span><br>
+        <span class="g">but “s” never appears without it</span><br>
+        5 ÷ (20 × 5) = <span class="hi2">.050</span> <span class="g">· u g scores .028</span></div>
+
+      <div class="after">
+        <div class="k">the corpus after one merge</div>
+        <div class="arow"><span class="tok">h</span><span class="tok">u</span><span class="tok c">gs</span></div>
+        <div class="arow" style="color:var(--faint); font-size:11px">hug, pug, pun and bun are left untouched</div>
+      </div>
+    </div>
+
+    <!-- ============ UNIGRAM ============ -->
+    <div>
+      <div class="nm">Unigram</div>
+      <div class="prov">Kudo, 2018 · T5</div>
+      <div class="does">Never merges. Starts with too many candidates and <span class="k3">drops the cheapest</span>.</div>
+
+      <div class="corp">
+        <div class="lbl tiny" style="margin-bottom:7px">every candidate substring, scored by what its removal would cost</div>
+        <div class="pool">
+          <span class="cand2 keep">ug</span><span class="cand2 keep">hug</span><span class="cand2 keep">un</span>
+          <span class="cand2 cut">pu</span><span class="cand2 cut">bu</span><span class="cand2 cut">gs</span>
+          <span class="cand2 cut">bun</span><span class="cand2 cut">pug</span><span class="cand2">hu</span>
+          <span class="cand2">pun</span><span class="cand2 cut">ugs</span><span class="cand2">hugs</span>
+        </div>
+      </div>
+
+      <div class="tally" style="margin-top:14px">
+        <span class="g">drop “pu” — pug still splits p·ug</span><br>
+        <span class="g">keep “ug” — hug, pug, hugs all need it</span></div>
+
+      <div class="after">
+        <div class="k">what survives the first pruning round</div>
+        <div class="arow">
+          <span class="tok v">ug</span><span class="tok v">un</span><span class="tok v">hug</span><span class="tok">hu</span>
+        </div>
+        <div class="arow" style="color:var(--faint); font-size:11px">a word may still split several ways —<br>the likeliest one wins</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="caption">
+    <b>The criterion is the design.</b> Identical corpus, identical starting characters — and the three rules
+    disagree on the very first thing they do. Byte-pair encoding fuses <span class="hi">u g</span> because it
+    is the commonest pair; WordPiece fuses <b>g s</b> instead, because although it occurs only five times,
+    “s” never appears without “g”. Unigram fuses nothing at all.
+  </div>
+</body></html>

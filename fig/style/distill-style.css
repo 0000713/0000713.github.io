@@ -1,0 +1,283 @@
+/* ============================================================================
+   FIGURE STYLE v4 — "distill illustration"
+   Reference: distill.pub (ctc, augmented-rnns, computing-receptive-fields).
+
+   The governing idea: a figure is a bare illustration on the page, not a card.
+   No frame, no title bar, no credit strip, no branding chrome. Meaning is
+   carried by tiny grey labels sitting next to the thing they name, and by a
+   short annotation set beside or beneath the diagram.
+
+   What this style REMOVES from v1-v3 (deliberately):
+     - the .figbar header (accent tick + rounded metric pill)
+     - the .figfoot credit strip (SOURCE · DIAGRAM: @…)
+     - outer panel borders, shadows, and rounded cards
+     - uppercase monospace as the default voice for every label
+     - the saturated orange as a structural colour
+
+   Canvas: width 1200. HEIGHT IS PER FIGURE — set
+       <meta name="figure-height" content="520">
+   and render.sh will size the window to it. Figures should be as short as
+   their content allows; whitespace above and below is the page's job.
+   ============================================================================ */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --paper: #ffffff;         /* figures sit on the article's white page */
+  --ink: #1a1a1a;           /* primary text */
+  --body: #3d3d3d;          /* annotation prose */
+  --label: #8c8c8c;         /* the small grey labels — the workhorse */
+  --faint: #b4b4b4;         /* de-emphasised text */
+  --rule: #e8e8e8;          /* hairlines, dividers */
+  --cell: #d8d8d8;          /* data-cell borders */
+  --cell-bg: #fafafa;       /* neutral cell fill */
+
+  /* desaturated accents. Warm is the through-line to the house brand;
+     cool and violet are for genuine two- and three-way contrasts only. */
+  --warm: #c1440e;
+  --warm-fill: #faeee7;
+  --warm-line: #e6c3ad;
+  --cool: #4a7ba7;
+  --cool-fill: #edf3f8;
+  --cool-line: #bcd3e5;
+  --violet: #7d6ba8;
+  --violet-fill: #f2effa;
+  --violet-line: #cfc6e4;
+  --flag: #a03c2e;          /* something is wrong here */
+
+  --serif: "Libre Baskerville","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans: -apple-system,"Helvetica Neue","Inter",Arial,sans-serif;
+  --mono: "SF Mono",ui-monospace,"JetBrains Mono",Menlo,monospace;
+}
+
+html, body { width: 1200px; }
+body {
+  background: var(--paper);
+  font-family: var(--sans);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+  padding: 26px 40px 22px;
+}
+
+/* --- the one piece of structure: an optional quiet heading ---------------- */
+/* Not a title bar. Just a line of small text, like distill's "How CTC
+   collapsing works". Use sparingly; most figures need no heading at all. */
+.fig-title {
+  font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--ink);
+  margin-bottom: 20px;
+}
+.fig-title .sub { color: var(--label); font-weight: 400; }
+
+/* --- labels: the primary annotation device ------------------------------- */
+/* .lbl is the small grey label that sits beside the thing it names. */
+.lbl {
+  font-family: var(--sans); font-size: 11px; line-height: 1.45; color: var(--label);
+  font-weight: 400;
+}
+.lbl.r { text-align: right; }
+.lbl b { color: var(--body); font-weight: 600; }
+.lbl.tiny { font-size: 10px; }
+
+/* .note — an annotation sentence set beside or under a diagram, in serif */
+.note {
+  font-family: var(--serif); font-size: 12.5px; line-height: 1.55; color: var(--body);
+}
+.note b { color: var(--ink); font-weight: 700; }
+.note .hi { color: var(--warm); }
+
+/* --- caption: small text below the figure -------------------------------- */
+.caption {
+  font-family: var(--sans); font-size: 12px; line-height: 1.55; color: var(--label);
+  margin-top: 20px; max-width: 940px;
+}
+.caption b { color: var(--ink); font-weight: 600; }
+.caption .hi { color: var(--warm); font-weight: 600; }
+
+/* --- cells: the atom of a sequence figure -------------------------------- */
+/* A thin-bordered box holding a character, token, or value. Pale fills only. */
+.cell {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 26px; height: 28px; padding: 0 7px;
+  border: 1px solid var(--cell); background: var(--paper);
+  font-family: var(--mono); font-size: 13px; color: var(--ink);
+  white-space: pre;
+}
+.cell.q    { background: var(--cell-bg); color: var(--body); }   /* quiet */
+.cell.warm { background: var(--warm-fill);   border-color: var(--warm-line);   color: var(--warm); }
+.cell.cool { background: var(--cool-fill);   border-color: var(--cool-line);   color: var(--cool); }
+.cell.viol { background: var(--violet-fill); border-color: var(--violet-line); color: var(--violet); }
+.cell.bad  { background: #fbf0ee; border: 1px dashed var(--flag); color: var(--flag); }
+.cell.wide { min-width: 46px; }
+.cell .id { font-size: 9px; color: var(--faint); margin-left: 6px; }
+.cell.warm .id { color: var(--warm-line); }
+
+.row { display: flex; gap: 3px; align-items: center; }
+.row.g { gap: 5px; }
+
+/* --- numbers and values -------------------------------------------------- */
+.num   { font-family: var(--mono); font-size: 13px; color: var(--ink); }
+.num.b { font-weight: 700; }
+.num.warm { color: var(--warm); }
+.num.cool { color: var(--cool); }
+.num.flag { color: var(--flag); }
+.big   { font-family: var(--mono); font-size: 26px; font-weight: 700; letter-spacing: -1px; color: var(--ink); }
+.big.warm { color: var(--warm); }
+
+/* --- bars: proportional, 3px, no track chrome --------------------------- */
+.bar { height: 3px; background: var(--rule); }
+.bar > span { display: block; height: 100%; background: var(--label); }
+.bar.warm > span { background: var(--warm); }
+.bar.cool > span { background: var(--cool); }
+.bar.flag > span { background: #c9a59c; }
+
+/* --- dividers ------------------------------------------------------------ */
+.hrule { height: 1px; background: var(--rule); }
+.vrule { width: 1px; background: var(--rule); }
+
+/* --- equations, set plainly like distill's inline math ------------------- */
+.eqn {
+  font-family: var(--mono); font-size: 19px; color: var(--ink); white-space: pre;
+  letter-spacing: -.2px;
+}
+.eqn .op  { color: var(--faint); }
+.eqn .var { color: var(--warm); }
+.eqn sub  { font-size: 11px; color: var(--label); }
+/* an under-brace tick, thin and grey — annotation, not decoration */
+.brace { height: 6px; border: 1px solid var(--rule); border-top: none; margin-top: 6px; }
+
+/* --- step markers: small, unobtrusive ----------------------------------- */
+.step {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 15px; height: 15px; border-radius: 99px;
+  background: var(--warm); color: #fff;
+  font-family: var(--sans); font-size: 9px; font-weight: 700;
+}
+.step.q { background: var(--label); }
+
+/* --- arrows -------------------------------------------------------------- */
+svg.wires { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+svg.wires path { stroke: var(--cell); stroke-width: 1; fill: none; }
+svg.wires path.warm { stroke: var(--warm-line); }
+svg.wires polygon { fill: var(--cell); }
+svg.wires polygon.warm { fill: var(--warm-line); }
+
+/* --- utilities ----------------------------------------------------------- */
+.mono { font-family: var(--mono); }
+.serif { font-family: var(--serif); }
+.dim  { color: var(--label); }
+.hi   { color: var(--warm); }
+.strike { text-decoration: line-through; color: var(--faint); }
+
+/* --- credit: one quiet line, for figures shared standalone ---------------- */
+/* Distill figures carry no branding. These get posted to X on their own, so a
+   single low-contrast line survives that context. Delete to go fully clean. */
+.credit {
+  font-family: var(--sans); font-size: 10px; color: #c2c2c2; margin-top: 13px;
+}
+.credit .sep { margin: 0 7px; }
+
+/* --- code: algorithms shown as figures ----------------------------------- */
+/* X Articles cannot render code blocks, so an algorithm ships as an image.
+   Set plainly — no window chrome, no traffic lights, no dark theme. */
+.code { font-family: var(--mono); font-size: 11.5px; line-height: 1.85;
+        color: var(--body); white-space: pre; }
+.code .c  { color: #b0b0b0; }                    /* comment */
+.code .k  { color: var(--violet); }              /* keyword */
+.code .s  { color: var(--cool); }                /* string / literal */
+.code .hl { background: var(--warm-fill); color: var(--warm); font-weight: 700;
+            padding: 1px 0; }                    /* the line that IS the criterion */
+.code .d  { color: var(--faint); }               /* de-emphasised scaffolding */
+
+/* ============================================================================
+   v4.1 — ARCHITECTURE PRIMITIVES
+   For block-diagram figures: operation pills, stacked depth, bracketed vectors,
+   heatmap grids, zoom callouts, tinted token spans, residual nodes.
+
+   Colour policy is unchanged from the rest of the system: COOL is the neutral
+   structural colour (most blocks are cool), WARM marks the one thing the figure
+   is actually about, VIOLET is the third voice for a genuine three-way split.
+   Reference diagrams in this genre are blue-on-blue throughout; here the blue
+   is the background hum and the rust is the signal.
+   ============================================================================ */
+
+/* --- operation blocks ---------------------------------------------------- */
+.op {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 7px 15px; border-radius: 5px;
+  font-family: var(--sans); font-size: 13px; font-weight: 700; white-space: nowrap;
+  background: var(--cool-fill); color: var(--cool); border: 1px solid var(--cool-line);
+}
+.op.warm  { background: var(--warm-fill);   color: var(--warm);   border-color: var(--warm-line); }
+.op.viol  { background: var(--violet-fill); color: var(--violet); border-color: var(--violet-line); }
+.op.q     { background: var(--cell-bg);     color: var(--body);   border-color: var(--cell); }
+.op.solid { background: var(--cool);        color: #fff;          border-color: var(--cool); }
+.op.solid.warm { background: var(--warm); border-color: var(--warm); color: #fff; }
+.op.sm    { padding: 5px 11px; font-size: 11.5px; }
+.op.wide  { width: 100%; }
+
+/* --- stacked depth: N identical things, drawn as offset copies ----------- */
+.stack { position: relative; display: inline-block; }
+.stack > .top { position: relative; z-index: 2; }
+.stack::before, .stack::after {
+  content: ""; position: absolute; inset: 0; border-radius: 5px;
+  background: var(--paper); border: 1px solid var(--cell);
+}
+.stack::after  { transform: translate(4px, -4px);  z-index: 1; }
+.stack::before { transform: translate(8px, -8px);  z-index: 0; }
+
+/* --- bracketed vector / matrix column ------------------------------------ */
+.vec {
+  position: relative; display: inline-flex; flex-direction: column; align-items: center;
+  gap: 5px; padding: 9px 13px; font-family: var(--mono); font-size: 12.5px; color: var(--cool);
+}
+.vec::before, .vec::after {
+  content: ""; position: absolute; top: 0; bottom: 0; width: 5px;
+  border: 1.5px solid var(--label);
+}
+.vec::before { left: 0;  border-right: none; }
+.vec::after  { right: 0; border-left: none; }
+.vec.warm { color: var(--warm); }
+.vec.q    { color: var(--faint); }
+.vec .dots { color: var(--faint); letter-spacing: 2px; line-height: .6; }
+.vecrow { display: flex; align-items: center; gap: 4px; }
+.vecrow .ell { font-family: var(--mono); color: var(--faint); font-size: 15px; margin-left: 4px; }
+
+/* --- heatmap grid: attention patterns, image patches --------------------- */
+/* Cell shade is set inline from a ramp; see .hm-cool / .hm-warm below.      */
+.hm { display: grid; gap: 1.5px; }
+.hm .c { width: 100%; aspect-ratio: 1 / 1; }
+.hm.bordered .c { outline: 1px solid #f0f0f0; outline-offset: -1px; }
+.hm-lbl { font-family: var(--sans); font-size: 10px; color: var(--label); }
+
+/* --- text with per-token tint (a tokenized sentence, inline) ------------- */
+.tokline { font-size: 17px; line-height: 1.9; color: var(--ink); }
+.tspan   { padding: 3px 1px; }
+
+/* --- residual / add node ------------------------------------------------- */
+.plus {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 17px; height: 17px; border-radius: 99px;
+  border: 1px solid var(--cell); background: var(--paper);
+  font-size: 11px; color: var(--label); line-height: 1;
+}
+
+/* --- big section label (the "Language" / "Vision" device) ---------------- */
+.seclabel { font-family: var(--sans); font-weight: 800; font-size: 34px;
+            letter-spacing: -1.3px; color: var(--cool); }
+.seclabel.warm { color: var(--warm); }
+
+/* --- callout / zoom lines and arrows ------------------------------------- */
+svg.lines { position: absolute; inset: 0; width: 100%; height: 100%;
+            pointer-events: none; overflow: visible; }
+svg.lines path        { stroke: var(--cell); stroke-width: 1; fill: none; }
+svg.lines path.zoom   { stroke: var(--faint); stroke-width: 1; stroke-dasharray: 4 4; }
+svg.lines path.warm   { stroke: var(--warm-line); }
+svg.lines path.dash   { stroke-dasharray: 4 4; }
+svg.lines polygon     { fill: var(--cell); }
+svg.lines polygon.warm{ fill: var(--warm-line); }
+
+/* --- a labelled block enclosure (the transformer box) -------------------- */
+.blk { border: 1px solid var(--cell); border-radius: 6px; padding: 14px; position: relative; }
+.blk .tag { position: absolute; top: -8px; left: 12px; background: var(--paper);
+            padding: 0 6px; font-family: var(--sans); font-size: 10px; color: var(--label); }

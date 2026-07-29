@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="style/cerebras-style.css">
+<style>
+.stage { position: absolute; top: 88px; left: 44px; right: 44px; bottom: 92px; }
+
+/* left: catch-up chart */
+.chart { position: absolute; left: 0; top: 0; width: 600px; height: 100%; padding: 18px 22px 14px; }
+.chart .axis { font-family: var(--mono); font-size: 10px; letter-spacing: 1.6px; color: var(--muted); font-weight: 700; }
+.chart svg { position: absolute; left: 22px; top: 46px; }
+.leg { position: absolute; left: 22px; bottom: 40px; display: flex; gap: 18px; align-items: center; }
+.leg .item { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 1.2px; }
+.leg .sw { display: inline-block; width: 22px; height: 4px; border-radius: 2px; vertical-align: middle; margin-right: 7px; }
+
+/* right: impact rows */
+.impact { position: absolute; left: 648px; right: 0; top: 0; }
+.irow { padding: 14px 18px 12px; margin-bottom: 18px; position: relative; }
+.irow .lname { font-weight: 800; font-size: 16px; }
+.irow .ltag { font-family: var(--mono); font-size: 9.5px; letter-spacing: 1.4px; color: var(--muted); font-weight: 700; margin-left: 8px; }
+.irow .fx { margin-top: 8px; }
+.irow .why { font-size: 11.5px; color: #57524a; margin-top: 7px; line-height: 1.4; }
+
+.punch { position: absolute; left: 44px; right: 44px; bottom: 30px; text-align: center; }
+.punch .line { font-size: 23px; font-weight: 800; letter-spacing: -0.4px; }
+.punch .line em { font-style: normal; color: var(--accent); }
+</style></head>
+<body>
+  <div class="figbar">
+    <div class="l">THE DESTABILIZER <span class="dim">/ OPEN-WEIGHT MODELS</span></div>
+    <div class="r">FRACTION OF THE PRICE</div>
+  </div>
+
+  <div class="stage">
+    <div class="chart panel">
+      <span class="axis">CAPABILITY ↑</span>
+      <svg width="552" height="308" viewBox="0 0 552 308">
+        <!-- grid -->
+        <g stroke="#eeebe4" stroke-width="1.5">
+          <line x1="0" y1="77" x2="552" y2="77"/><line x1="0" y1="154" x2="552" y2="154"/>
+          <line x1="0" y1="231" x2="552" y2="231"/><line x1="0" y1="296" x2="552" y2="296"/>
+        </g>
+        <!-- shrinking gap fill -->
+        <path d="M 20 60 C 200 42, 400 34, 530 28 L 530 64 C 400 76, 230 120, 20 268 Z" fill="#fdeee6" opacity="0.55"/>
+        <!-- closed frontier -->
+        <path d="M 20 60 C 200 42, 400 34, 530 28" stroke="#14120f" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <!-- open-weight -->
+        <path d="M 20 268 C 230 120, 400 76, 530 64" stroke="#f15a24" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <!-- release ticks on open curve -->
+        <g fill="#f15a24">
+          <circle cx="150" cy="192" r="5"/><circle cx="280" cy="122" r="5"/><circle cx="400" cy="86" r="5"/><circle cx="530" cy="64" r="5"/>
+        </g>
+        <!-- gap annotation -->
+        <line x1="490" y1="34" x2="490" y2="60" stroke="#8a857c" stroke-width="1.5"/>
+        <g font-family="SF Mono, Menlo, monospace" font-size="10" font-weight="700" letter-spacing="1">
+          <text x="342" y="22" fill="#14120f">CLOSED FRONTIER</text>
+          <text x="80" y="240" fill="#f15a24">EVERY RELEASE CLOSES IT</text>
+          <text x="360" y="116" fill="#8a857c">THE GAP: CLOSING,</text>
+          <text x="360" y="130" fill="#8a857c">NOT CLOSED</text>
+        </g>
+      </svg>
+      <div class="leg">
+        <span class="item"><span class="sw" style="background:#14120f"></span>$$$ / M TOKENS</span>
+        <span class="item" style="color:var(--accent)"><span class="sw" style="background:var(--accent)"></span>¢ / M TOKENS · DEEPSEEK · GLM · KIMI · QWEN</span>
+      </div>
+      <span class="axis" style="position:absolute; right:22px; bottom:14px">TIME →</span>
+    </div>
+
+    <div class="impact">
+      <div class="micro" style="margin-bottom:10px">EVERY RELEASE HITS ALL THREE LAYERS</div>
+      <div class="irow panel">
+        <span class="lname">Applications</span><span class="ltag">L3</span>
+        <div class="fx"><span class="chip boost">SUBSIDIZED</span></div>
+        <div class="why">Cheaper intelligence input → margins the closed labs used to keep.</div>
+      </div>
+      <div class="irow panel" style="border-color:#d9d4ca">
+        <span class="lname">Foundation models</span><span class="ltag">L2</span>
+        <div class="fx"><span class="chip penal">PRICING POWER ERODED</span></div>
+        <div class="why">"Good enough, months behind, far cheaper" caps what frontier can charge.</div>
+      </div>
+      <div class="irow panel">
+        <span class="lname">Semiconductors</span><span class="ltag">L1</span>
+        <div class="fx"><span class="chip boost">MORE CHIPS SOLD</span></div>
+        <div class="why">More labs + more apps that can afford to run AI = more compute demand.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="punch">
+    <div class="line">One layer's disruption is <em>two layers'</em> business model.</div>
+  </div>
+
+  <div class="figfoot" style="bottom:8px; border-top:none;">
+    <div class="brand"></div>
+    <div class="brand">DIAGRAM: @SUSHANT_P18</div>
+  </div>
+</body></html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="style/cerebras-style.css">
+<style>
+.stage { position: absolute; top: 74px; left: 44px; right: 44px; bottom: 64px; }
+
+.query { position: absolute; top: 0; left: 0; width: 300px; }
+.query .panel { padding: 14px 18px 12px; border: 2px solid var(--ink); }
+.query .q { font-size: 16.5px; font-weight: 700; letter-spacing: -0.2px; }
+
+.signals { position: absolute; top: 118px; left: 0; width: 300px; }
+.sig { padding: 14px 15px 12px; margin-bottom: 22px; }
+.sig .name { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 1.6px; }
+.sig .what { font-size: 11.5px; color: var(--muted); margin-top: 3px; line-height: 1.35; }
+
+.cands { position: absolute; top: 0; left: 356px; right: 0; }
+.cand { padding: 17px 17px 15px; margin-bottom: 26px; position: relative; }
+.cand .top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
+.cand .kind { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 1.6px; color: var(--muted); }
+.cand .txt { font-size: 13.5px; line-height: 1.4; }
+.cand .chips { margin-top: 7px; display: flex; gap: 6px; flex-wrap: wrap; }
+.cand .rank { position: absolute; left: -34px; top: 12px; font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--muted); }
+.cand.win { border: 2px solid var(--accent); }
+.cand.win .rank { color: var(--accent); }
+</style></head>
+<body>
+  <div class="figbar">
+    <div class="l">SLACK RETRIEVAL <span class="dim">/ 4 SIGNALS, ONE QUERY</span></div>
+    <div class="r">NO SINGLE SCORER TRUSTED</div>
+  </div>
+
+  <div class="stage">
+    <div class="query">
+      <div class="micro" style="margin-bottom:8px">QUERY</div>
+      <div class="panel"><div class="q">“restore hangs after manifest load”</div></div>
+    </div>
+
+    <div class="signals">
+      <div class="micro" style="margin-bottom:8px">SIGNALS RUN TOGETHER</div>
+      <div class="sig panel"><div class="name">FULL-TEXT</div><div class="what">exact error strings &amp; flags — lexical match beats similarity</div></div>
+      <div class="sig panel"><div class="name">EMBEDDINGS</div><div class="what">paraphrase — different words, same problem</div></div>
+      <div class="sig panel"><div class="name">IDF</div><div class="what">rare tokens rank; “thanks!” scores ~0</div></div>
+      <div class="sig panel"><div class="name">AGE DECAY</div><div class="what">answers expire — newer wins ties</div></div>
+    </div>
+
+    <div class="cands">
+      <div class="micro" style="margin-bottom:8px;margin-left:2px">CANDIDATES · SAME CORPUS</div>
+
+      <div class="cand panel win"><span class="rank">1</span>
+        <div class="top"><span class="kind">MESSAGE</span><span class="micro">1D AGO</span></div>
+        <div class="txt"><span class="code">ERR_MANIFEST_TIMEOUT</span>: restore hangs after manifest load.</div>
+        <div class="chips"><span class="chip boost">EXACT TOKENS</span><span class="chip boost">RARE: ERR_MANIFEST_TIMEOUT</span></div>
+      </div>
+
+      <div class="cand panel"><span class="rank">2</span>
+        <div class="top"><span class="kind">THREAD</span><span class="micro">2W AGO</span></div>
+        <div class="txt">Checkpoint stalls on the NFS mount — set <span class="code">CKPT_PREFETCH=4</span>.</div>
+        <div class="chips"><span class="chip neutral">NO SHARED TOKENS</span><span class="chip boost">PARAPHRASE MATCH</span><span class="chip boost">RECENT WINS TIE</span></div>
+      </div>
+
+      <div class="cand panel"><span class="rank">3</span>
+        <div class="top"><span class="kind">THREAD</span><span class="micro">8MO AGO</span></div>
+        <div class="txt">restore hangs after manifest load → use <span class="code">LEGACY_FETCHER=1</span>.</div>
+        <div class="chips"><span class="chip neutral">ALSO MATCHES</span><span class="chip penal">8 MO: DECAYED</span></div>
+      </div>
+
+      <div class="cand panel"><span class="rank">4</span>
+        <div class="top"><span class="kind">MESSAGE</span><span class="micro">3H AGO</span></div>
+        <div class="txt">sounds good, thanks! will try that</div>
+        <div class="chips"><span class="chip penal">FALSE NEIGHBOR</span><span class="chip penal">NO RARE TOKENS</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="figfoot">
+    <div class="brand"><span class="chip boost" style="margin-right:8px">BOOSTED</span><span class="chip penal">PENALIZED</span></div>
+    <div class="brand">SOURCE: CEREBRAS ENG BLOG · DIAGRAM: @SUSHANT_P18</div>
+  </div>
+</body></html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="style/cerebras-style.css">
+<style>
+.stage { position: absolute; top: 88px; left: 44px; right: 44px; bottom: 96px; }
+
+.layer { position: absolute; left: 176px; width: 636px; padding: 17px 24px 15px; }
+.layer .name { font-weight: 800; font-size: 22px; letter-spacing: -0.4px; }
+.layer .who { font-family: var(--mono); font-size: 11px; letter-spacing: 1.4px; color: var(--muted); margin-top: 5px; }
+.layer .tag { position: absolute; top: -11px; left: 22px; background: var(--ink); color: #fff; font-family: var(--mono);
+  font-size: 10px; font-weight: 700; letter-spacing: 1.6px; border-radius: 4px; padding: 3px 9px; }
+
+.play { position: absolute; left: 856px; width: 268px; }
+.play .micro2 { font-family: var(--mono); font-size: 10px; letter-spacing: 1.6px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+.play .txt { font-size: 12.5px; line-height: 1.45; color: #57524a; }
+.play .txt b { color: var(--ink); }
+
+.squeeze { position: absolute; left: 176px; width: 636px; display: flex; align-items: center; justify-content: center; gap: 14px; }
+.squeeze .chip { font-size: 10px; }
+
+.ow { position: absolute; left: 0; top: 0; width: 150px; text-align: left; }
+.ow .lbl { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 1.2px; color: var(--accent); line-height: 1.5; }
+
+svg.wires { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+svg.wires line, svg.wires path { stroke: #c9c3b8; stroke-width: 2; fill: none; }
+svg.wires .hot { stroke: var(--accent); }
+svg.wires polygon { fill: #c9c3b8; }
+svg.wires polygon.hot { fill: var(--accent); }
+
+.punch { position: absolute; left: 44px; right: 44px; bottom: 34px; text-align: center; }
+.punch .line { font-size: 25px; font-weight: 800; letter-spacing: -0.5px; }
+.punch .line em { font-style: normal; color: var(--accent); }
+.punch .rule { width: 340px; height: 4px; margin: 10px auto 0; border-radius: 2px;
+  background: linear-gradient(90deg, #22b8cf, #7c6ff0, var(--accent)); }
+</style></head>
+<body>
+  <div class="figbar">
+    <div class="l">THE THREE-LAYER AI WAR <span class="dim">/ WHO COMMODITIZES WHOM</span></div>
+    <div class="r">FOLLOW THE INCENTIVES</div>
+  </div>
+
+  <div class="stage">
+    <svg class="wires">
+      <!-- apps push down -->
+      <line class="hot" x1="316" y1="86" x2="316" y2="128"/><polygon class="hot" points="311,128 316,138 321,128"/>
+      <line class="hot" x1="672" y1="86" x2="672" y2="128"/><polygon class="hot" points="667,128 672,138 677,128"/>
+      <!-- semis push up -->
+      <line class="hot" x1="316" y1="316" x2="316" y2="274"/><polygon class="hot" points="311,274 316,264 321,274"/>
+      <line class="hot" x1="672" y1="316" x2="672" y2="274"/><polygon class="hot" points="667,274 672,264 677,274"/>
+      <!-- open-weight strike into models -->
+      <line class="hot" x1="18" y1="228" x2="154" y2="228"/><polygon class="hot" points="154,223 164,228 154,233"/>
+    </svg>
+
+    <div class="layer panel" style="top:0"><span class="tag">L3 · INTERFACE</span>
+      <div class="name">Applications</div>
+      <div class="who">CHATGPT · PERPLEXITY · PALANTIR · AI SAAS</div></div>
+    <div class="play" style="top:8px">
+      <div class="micro2">THE PLAY</div>
+      <div class="txt"><b>Wants intelligence cheap &amp; swappable</b> — like electricity. Complains about token costs in public.</div></div>
+
+    <div class="squeeze" style="top:96px"><span class="chip boost">MAKE TOKENS CHEAP</span></div>
+
+    <div class="layer panel" style="top:148px; border: 2px solid var(--ink);"><span class="tag" style="background:var(--accent)">L2 · THE MOAT UNDER SIEGE</span>
+      <div class="name">Foundation models</div>
+      <div class="who">OPENAI · ANTHROPIC · GOOGLE · XAI</div></div>
+    <div class="play" style="top:156px">
+      <div class="micro2">THE PLAY</div>
+      <div class="txt"><b>Defends in both directions</b> — expands up into apps (ChatGPT platform, Claude Code) and down into silicon (Broadcom, Cerebras deals).</div></div>
+    <div class="ow" style="top:164px">
+      <div class="lbl">OPEN-WEIGHT MODELS<br><span style="color:var(--muted)">DEEPSEEK · GLM · KIMI</span></div></div>
+
+    <div class="squeeze" style="top:284px"><span class="chip boost">MORE MODEL COMPETITION = MORE CHIPS SOLD</span></div>
+
+    <div class="layer panel" style="top:336px"><span class="tag">L1 · PICKS &amp; SHOVELS</span>
+      <div class="name">Semiconductors &amp; infra</div>
+      <div class="who">NVIDIA · BROADCOM · TSMC</div></div>
+    <div class="play" style="top:344px">
+      <div class="micro2">THE PLAY</div>
+      <div class="txt"><b>Open-sources its own models happily</b> — every new model lab is a new GPU customer. Chaos above = demand below.</div></div>
+  </div>
+
+  <div class="punch">
+    <div class="line">Every layer wants the <em>other</em> layers commoditized.</div>
+    <div class="rule"></div>
+  </div>
+</body></html>

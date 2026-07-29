@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="style/cerebras-style.css">
+<style>
+  .grid { position:absolute; top:74px; left:44px; right:44px; bottom:64px;
+    display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:14px; }
+  .cell { background:var(--panel); border:1.5px solid var(--hairline); border-radius:11px; box-shadow:var(--shadow-sm);
+    padding:16px 18px; position:relative; display:flex; flex-direction:column; }
+  .cell .hd { display:flex; align-items:center; gap:9px; margin-bottom:12px; }
+  .cell .hd .no { font-family:var(--mono); font-size:10px; font-weight:700; color:#fff; background:var(--ink); border-radius:5px; padding:3px 8px; letter-spacing:1px; }
+  .cell .hd h3 { font-size:15.5px; letter-spacing:-.2px; }
+  .cell .body { flex:1; display:flex; flex-direction:column; justify-content:center; gap:9px; }
+  .cell .sowhat { font-family:var(--mono); font-size:10.5px; color:var(--ink-soft); border-top:1px solid var(--hairline); padding-top:10px; margin-top:12px; line-height:1.45; }
+  .cell .sowhat b { color:var(--accent); }
+
+  .pairline { display:flex; align-items:center; gap:10px; }
+  .pairline .vs { font-family:var(--mono); font-size:11px; color:var(--muted); }
+  .neq { font-family:var(--mono); font-size:20px; color:var(--danger); font-weight:700; }
+  .row-in { display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
+  .arrowr { font-family:var(--mono); color:var(--muted); font-size:14px; }
+
+  /* multilingual bars */
+  .lang { display:flex; align-items:center; gap:12px; }
+  .lang .name { width:96px; font-family:var(--mono); font-size:11px; color:var(--ink-soft); }
+  .lang .bar { flex:1; }
+  .lang .val { width:64px; text-align:right; font-family:var(--mono); font-size:11px; font-weight:700; color:var(--ink); }
+  .lang .val .u { color:var(--muted); font-weight:400; font-size:9px; }
+</style></head>
+<body>
+  <div class="figbar">
+    <div class="l">TOKENIZATION <span class="dim">/ FOUR THINGS THAT BREAK IN PRODUCTION</span></div>
+    <div class="r">IT'S INTEGERS, NOT TEXT</div>
+  </div>
+
+  <div class="grid">
+    <!-- 1: leading space -->
+    <div class="cell">
+      <div class="hd"><span class="no">01</span><h3>The space is part of the token</h3></div>
+      <div class="body">
+        <div class="pairline">
+          <span class="tok merge">the<span class="id">1169</span></span>
+          <span class="neq">≠</span>
+          <span class="tok merge"><span class="spc">▁</span>the<span class="id">262</span></span>
+        </div>
+        <div class="micro">real GPT-2 ids — " the" is so common it earned the <b class="hot">smaller</b> number</div>
+      </div>
+      <div class="sowhat">Prompts are <b>whitespace-sensitive</b>. A stray leading space silently changes the tokens the model sees.</div>
+    </div>
+
+    <!-- 2: numbers -->
+    <div class="cell">
+      <div class="hd"><span class="no">02</span><h3>Numbers get chopped</h3></div>
+      <div class="body">
+        <div class="row-in">
+          <span class="tok">1234567</span>
+          <span class="arrowr">→</span>
+          <span class="tok byte">123<span class="id">10163</span></span><span class="tok byte">45<span class="id">2231</span></span><span class="tok byte">67<span class="id">3134</span></span>
+        </div>
+        <div class="micro">real GPT-2 split — "1234567" breaks into 123 · 45 · 67</div>
+      </div>
+      <div class="sowhat">A real reason models <b>fumble arithmetic</b>: the digits never arrive as clean, aligned units.</div>
+    </div>
+
+    <!-- 3: multilingual tax -->
+    <div class="cell">
+      <div class="hd"><span class="no">03</span><h3>The multilingual tax</h3></div>
+      <div class="body" style="gap:12px">
+        <div class="lang"><span class="name">English</span><div class="bar hot"><span style="width:24%"></span></div><span class="val">~4<span class="u"> B/tok</span></span></div>
+        <div class="lang"><span class="name">Hindi / CJK</span><div class="bar"><span style="width:70%"></span></div><span class="val">2–3×<span class="u"> tokens</span></span></div>
+        <div class="micro">same meaning, more tokens — UTF-8 already costs 3 bytes/char</div>
+      </div>
+      <div class="sowhat">Non-English users pay <b>more per message</b> and get <b>less context</b>. The gap is baked into the tokenizer.</div>
+    </div>
+
+    <!-- 4: glitch tokens -->
+    <div class="cell">
+      <div class="hd"><span class="no">04</span><h3>Glitch tokens</h3></div>
+      <div class="body">
+        <div class="row-in">
+          <span class="tok glitch"><span class="spc">▁</span>SolidGoldMagikarp<span class="id">43453</span></span>
+          <span class="arrowr">→</span>
+          <span class="chip danger">untrained embedding</span>
+        </div>
+        <div class="micro">one real GPT-2 token, then almost never seen in training</div>
+      </div>
+      <div class="sowhat">The vector was created but <b>never learned</b>. Feed it in and the model <b>hallucinates or breaks</b> — a ghost of the merge step.</div>
+    </div>
+  </div>
+
+  <div class="figfoot">
+    <div class="brand">FIG. 3 — HALF OF "WEIRD LLM BEHAVIOR" IS <span class="hot">JUST THE TOKENIZER</span></div>
+    <div class="brand">SOURCE: STANFORD CS336 L1 · DIAGRAM: @SUSHANT_P18</div>
+  </div>
+</body></html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="style/cerebras-style.css">
+<style>
+  .lede { position:absolute; top:74px; left:44px; right:44px; display:flex; justify-content:space-between; align-items:flex-end; }
+  .lede .q { font-size:15px; color:var(--ink-soft); }
+  .lede .q b { color:var(--ink); font-weight:700; }
+  .lede .sample { font-family:var(--mono); font-size:15px; background:var(--panel); border:1.5px solid var(--hairline);
+    border-radius:8px; padding:9px 13px; box-shadow:var(--shadow-sm); color:var(--ink); }
+
+  .rows { position:absolute; top:150px; left:44px; right:44px; bottom:64px;
+    display:grid; grid-template-rows:repeat(4,1fr); gap:12px; }
+  .row { display:grid; grid-template-columns:150px 1fr 210px; align-items:center; gap:20px;
+    background:var(--panel); border:1.5px solid var(--hairline); border-radius:10px; box-shadow:var(--shadow-sm);
+    padding:0 20px; position:relative; }
+  .row.win { border:2px solid var(--accent); box-shadow:0 0 0 4px var(--accent-soft), var(--shadow); }
+
+  .who .name { font-weight:700; font-size:16px; letter-spacing:-.2px; }
+  .who .name .id { font-family:var(--mono); font-size:10px; color:var(--muted); font-weight:700; display:block; margin-top:3px; letter-spacing:.6px; text-transform:uppercase; }
+
+  .toks { display:flex; gap:5px; flex-wrap:wrap; align-items:center; }
+  .toks .more { font-family:var(--mono); font-size:11px; color:var(--muted); align-self:center; }
+
+  .metric { text-align:right; }
+  .metric .top { display:flex; align-items:baseline; justify-content:flex-end; gap:8px; }
+  .metric .ratio { font-family:var(--mono); font-weight:700; font-size:26px; letter-spacing:-1px; }
+  .metric .ratio .u { font-size:12px; color:var(--muted); letter-spacing:0; }
+  .metric.hot .ratio { color:var(--accent); }
+  .metric .bar { margin-top:8px; width:170px; margin-left:auto; }
+  .metric .verdict { font-family:var(--mono); font-size:9.5px; letter-spacing:1.2px; text-transform:uppercase; color:var(--muted); margin-top:7px; }
+  .metric .verdict.bad { color:var(--danger); }
+  .metric .verdict.ok  { color:var(--good); }
+
+  .tagpin { position:absolute; top:-9px; right:16px; }
+</style></head>
+<body>
+  <div class="figbar">
+    <div class="l">TOKENIZATION <span class="dim">/ ONE SENTENCE, FOUR SCHEMES</span></div>
+    <div class="r">COMPRESSION · BYTES / TOKEN</div>
+  </div>
+
+  <div class="lede">
+    <div class="q">Every scheme maps the <b>same 11 bytes</b> to integers.<br>The question is only: <b>how many, and how robust?</b></div>
+    <div class="sample">"the cat sat"</div>
+  </div>
+
+  <div class="rows">
+    <!-- CHARACTER -->
+    <div class="row">
+      <div class="who"><div class="name">Character<span class="id">Unicode code points</span></div></div>
+      <div class="toks">
+        <span class="tok char">t</span><span class="tok char">h</span><span class="tok char">e</span>
+        <span class="tok char">␣</span><span class="tok char">c</span><span class="tok char">a</span><span class="tok char">t</span>
+        <span class="tok char">␣</span><span class="tok char">s</span><span class="tok char">a</span><span class="tok char">t</span>
+      </div>
+      <div class="metric">
+        <div class="top"><span class="ratio">1.0<span class="u"> B/tok</span></span></div>
+        <div class="bar cool"><span style="width:18%"></span></div>
+        <div class="verdict">~150K vocab · mostly unused</div>
+      </div>
+    </div>
+
+    <!-- BYTE -->
+    <div class="row">
+      <div class="who"><div class="name">Byte<span class="id">raw UTF-8</span></div></div>
+      <div class="toks">
+        <span class="tok byte">74</span><span class="tok byte">68</span><span class="tok byte">65</span>
+        <span class="tok byte">20</span><span class="tok byte">63</span><span class="tok byte">61</span><span class="tok byte">74</span>
+        <span class="tok byte">20</span><span class="tok byte">73</span><span class="tok byte">61</span><span class="tok byte">74</span>
+      </div>
+      <div class="metric">
+        <div class="top"><span class="ratio">1.0<span class="u"> B/tok</span></span></div>
+        <div class="bar"><span style="width:18%"></span></div>
+        <div class="verdict">256 vocab · sequences explode</div>
+      </div>
+    </div>
+
+    <!-- WORD -->
+    <div class="row">
+      <div class="who"><div class="name">Word<span class="id">split on whitespace</span></div></div>
+      <div class="toks">
+        <span class="tok word">the</span><span class="tok word">cat</span><span class="tok word">sat</span>
+        <span class="more">→ but "catsat", typos, names → <span class="strike">UNK</span></span>
+      </div>
+      <div class="metric">
+        <div class="top"><span class="ratio">~5<span class="u"> B/tok</span></span></div>
+        <div class="bar"><span style="width:84%"></span></div>
+        <div class="verdict bad">✕ ∞ vocab · UNK unrecoverable</div>
+      </div>
+    </div>
+
+    <!-- BPE -->
+    <div class="row win">
+      <div class="tagpin"><span class="chip boost">THE NEGOTIATED PEACE</span></div>
+      <div class="who"><div class="name">BPE<span class="id">learned merges · GPT-2</span></div></div>
+      <div class="toks">
+        <span class="tok merge">the</span>
+        <span class="tok merge"><span class="spc">▁</span>cat</span>
+        <span class="tok merge"><span class="spc">▁</span>sat</span>
+        <span class="more">leading space is part of the token</span>
+      </div>
+      <div class="metric hot">
+        <div class="top"><span class="ratio">~4<span class="u"> B/tok</span></span></div>
+        <div class="bar hot"><span style="width:70%"></span></div>
+        <div class="verdict ok">✓ 50,257 vocab · zero UNK</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="figfoot">
+    <div class="brand">FIG. 1 — CHAR &amp; BYTE COMPRESS BADLY · WORD BREAKS ON THE UNKNOWN · <span class="hot">BPE KEEPS BOTH</span></div>
+    <div class="brand">SOURCE: STANFORD CS336 L1 · DIAGRAM: @SUSHANT_P18</div>
+  </div>
+</body></html>

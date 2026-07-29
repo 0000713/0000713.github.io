@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>An LLM has never seen a letter in its life - Sushant&#x27;s Open Notebook</title>
+<meta name="description" content="A visual tour from raw bytes to BPE: how one invisible translation layer sets model cost, context capacity, and many of the bugs that look like model failures.">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#050505">
+<link rel="canonical" href="https://sushant-97.github.io/an-llm-has-never-seen-a-letter/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Sushant&#x27;s Open Notebook">
+<meta property="og:title" content="An LLM has never seen a letter in its life - Sushant&#x27;s Open Notebook">
+<meta property="og:description" content="A visual tour from raw bytes to BPE: how one invisible translation layer sets model cost, context capacity, and many of the bugs that look like model failures.">
+<meta property="og:url" content="https://sushant-97.github.io/an-llm-has-never-seen-a-letter/">
+<meta property="og:image" content="https://sushant-97.github.io/img/og-an-llm-has-never-seen-a-letter.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sushant_p18">
+<meta name="twitter:creator" content="@sushant_p18">
+<meta name="twitter:image" content="https://sushant-97.github.io/img/og-an-llm-has-never-seen-a-letter.jpg">
+<meta property="article:published_time" content="2026-07-21">
+<!-- The font is discovered inside the stylesheet, which is itself a blocking
+     request - so without this it starts two round trips late and the first paint
+     is in a fallback face. -->
+<link rel="preload" href="/fonts/geist-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/style.css">
+<link rel="alternate" type="application/rss+xml" title="Sushant&#x27;s Open Notebook" href="/rss.xml">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"An LLM has never seen a letter in its life - Sushant's Open Notebook","description":"A visual tour from raw bytes to BPE: how one invisible translation layer sets model cost, context capacity, and many of the bugs that look like model failures.","url":"https://sushant-97.github.io/an-llm-has-never-seen-a-letter/","image":"https://sushant-97.github.io/img/og-an-llm-has-never-seen-a-letter.jpg","datePublished":"2026-07-21","author":{"@type":"Person","name":"Sushant Pargaonkar","url":"https://x.com/sushant_p18"},"publisher":{"@type":"Person","name":"Sushant Pargaonkar"},"isAccessibleForFree":true}</script>
+</head>
+<body class="chapter-page">
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <button class="top-menu" type="button" id="menu-open" aria-label="Open the contents"
+    aria-expanded="false" aria-controls="sidebar"><span></span><span></span><span></span></button>
+  <a class="top-home" href="/"><b>Sushant's</b> Open Notebook</a>
+  <span class="top-where">Track I <i>/</i> Core LLM <i>/</i> 01</span>
+  <button class="top-search" type="button" id="search-open" aria-label="Search the book">
+    <span>Search</span><kbd>&#8984;K</kbd></button>
+  <nav class="top-links" aria-label="Site">
+    <a href="/">Tracks</a><a href="/rss.xml">RSS</a>
+    <a href="https://x.com/sushant_p18">X</a>
+  </nav>
+</header>
+<div class="book">
+  <aside class="sidebar" id="sidebar" aria-label="Core LLM contents">
+  <div class="side-head">
+    <a class="side-back" href="/">&larr; All tracks</a>
+    <button class="side-close" type="button" id="menu-close" aria-label="Close the contents">&times;</button>
+    <a class="side-home" href="/core-llm/">
+      <span class="part-n">Track I</span>
+      Core LLM</a>
+    <div class="side-progress track-meter" data-track="core-llm"><div class="part-bar"><i></i></div><span class="side-count">0/2 read</span></div>
+  </div>
+  <nav class="side-body"><ol class="chapters"><li class="ch here" data-chapter="an-llm-has-never-seen-a-letter"><a href="/an-llm-has-never-seen-a-letter/" aria-current="page"><span class="ch-num">01</span><span class="ch-title">An LLM has never seen a letter in its life</span><i class="ch-dot" aria-hidden="true"></i></a><button class="ch-mark" type="button" aria-pressed="false" data-bookmark="an-llm-has-never-seen-a-letter" aria-label="Bookmark An LLM has never seen a letter in its life">&#9733;</button><ul class="toc"><li class="lvl2"><a href="#it-reads-integers-not-text">It reads integers, not text</a></li><li class="lvl2"><a href="#attempt-1-one-token-per-character">Attempt 1 - one token per character</a></li><li class="lvl2"><a href="#attempt-2-one-token-per-byte">Attempt 2 - one token per byte</a></li><li class="lvl2"><a href="#attempt-3-one-token-per-word">Attempt 3 - one token per word</a></li><li class="lvl2"><a href="#the-answer-byte-pair-encoding">The answer - Byte-Pair Encoding</a></li><li class="lvl2"><a href="#what-gpt-2-s-tokenizer-actually-is">What GPT-2&#x27;s tokenizer actually is</a></li><li class="lvl2"><a href="#the-details-that-break-real-systems">The details that break real systems</a></li><li class="lvl2"><a href="#the-mental-model-to-keep">The mental model to keep</a></li><li class="lvl2"><a href="#why-this-is-worth-a-whole-lecture">Why this is worth a whole lecture</a></li></ul></li><li class="ch" data-chapter="hidden-language-tax"><a href="/hidden-language-tax/"><span class="ch-num">02</span><span class="ch-title">The hidden language tax</span><i class="ch-dot" aria-hidden="true"></i></a><button class="ch-mark" type="button" aria-pressed="false" data-bookmark="hidden-language-tax" aria-label="Bookmark The hidden language tax">&#9733;</button></li></ol></nav>
+</aside>
+<div class="scrim" id="scrim" hidden></div>
+  <div class="gutter" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Resize the contents - arrow keys adjust, Home resets"></div>
+  <main id="main" class="book-main" data-chapter="an-llm-has-never-seen-a-letter">
+    <article>
+      <header class="art-head">
+        <p class="kicker"><span class="art-num">Chapter 01</span>
+          <a href="/core-llm/">Track I &middot;
+            Core LLM</a></p>
+        <h1>An LLM has never seen a letter in its life</h1>
+        <p class="deck">A visual tour from raw bytes to BPE: how one invisible translation layer sets model cost, context capacity, and many of the bugs that look like model failures.</p>
+        <p class="byline">Sushant Pargaonkar<i></i>
+          <time datetime="2026-07-21">
+            Jul 21, 2026</time>
+          <i></i>6 min<i></i>3 diagrams
+          <button class="mark-read" type="button" id="mark-read" aria-pressed="false">
+            Mark as read</button></p>
+      </header>
+      <div class="prose"><figure id="fig-tok-01-four-tokenizers" class="fig"><div class="fig-frame" style="aspect-ratio:1200/675"><iframe src="/fig/tok-01-four-tokenizers.html" title="The same sentence under four tokenizers" loading="lazy" scrolling="no" style="width:1200px;height:675px"></iframe></div><a class="fig-open" href="/fig/tok-01-four-tokenizers.html" target="_blank" rel="noopener">Open figure</a><figcaption>The same sentence under four tokenizers</figcaption></figure>
+<p>It reads integers. Everything you type becomes a list of numbers before the model sees a thing - and that translation layer, the tokenizer, quietly sets your cost, your context window, and half your weird bugs. Here is the whole thing, from bytes up, the way Stanford's CS336 teaches it in lecture one.</p>
+<h2 id="it-reads-integers-not-text">It reads integers, not text<a class="anchor" href="#it-reads-integers-not-text" aria-label="Link to this section" tabindex="-1">#</a></h2>
+<p>A model does math on numbers, not characters. So step zero of every LLM is a reversible map: string → list of integers → string. The tokenizer owns that map.</p>
+<p>The number that decides everything is the <strong>compression ratio</strong>: bytes ÷ tokens. Higher means each token carries more text, which means shorter sequences. And sequence length is not free - attention scales with the <em>square</em> of it. Halve your tokens and you roughly quarter the compute, while fitting twice the context in the same window. The tokenizer silently sets the ceiling on both price and memory.</p>
+<h2 id="attempt-1-one-token-per-character">Attempt 1 - one token per character<a class="anchor" href="#attempt-1-one-token-per-character" aria-label="Link to this section" tabindex="-1">#</a></h2>
+<p>Map every Unicode code point to an integer. Clean and intuitive. The problem is the vocabulary: Unicode has about <strong>150,000</strong> code points, most of them rare characters and emoji that almost never appear - yet each one still burns a row in the embedding table. You pay for a giant vocabulary and use a sliver of it, and common words still fragment into many tokens.</p>
+<h2 id="attempt-2-one-token-per-byte">Attempt 2 - one token per byte<a class="anchor" href="#attempt-2-one-token-per-byte" aria-label="Link to this section" tabindex="-1">#</a></h2>
+<p>Encode the text as UTF-8. Now the vocabulary is exactly <strong>256</strong>. Tiny, universal, and there is no such thing as an unknown character. But the compression ratio collapses to about 1 byte per token, so sequences get brutally long and attention cost explodes with them. Worth knowing: UTF-8 is variable width - English is 1 byte per character, but many scripts are 3 - so non-English text is penalized before the tokenizer does anything clever.</p>
+<h2 id="attempt-3-one-token-per-word">Attempt 3 - one token per word<a class="anchor" href="#attempt-3-one-token-per-word" aria-label="Link to this section" tabindex="-1">#</a></h2>
+<p>Split on whitespace and punctuation. Great compression, one token per word. But the vocabulary is now unbounded. New words, typos, product names, code identifiers - all collapse to a single "unknown" token, and that unknown is information you can never recover. Good ratio, fatal edge cases.</p>
+<h2 id="the-answer-byte-pair-encoding">The answer - Byte-Pair Encoding<a class="anchor" href="#the-answer-byte-pair-encoding" aria-label="Link to this section" tabindex="-1">#</a></h2>
+<p>Sennrich and colleagues introduced BPE for translation in 2016; GPT-2 made it the default. Instead of picking a rule, it <em>learns</em> the vocabulary from data. Common sequences like "the", "ing" and "tion" get merged early into single tokens; rare words stay split into subword pieces. The result is the best of every earlier attempt - a bounded vocabulary, strong compression, and zero unknowns. The whole training loop is four steps:</p>
+<ul><li>Start from raw bytes (vocabulary = 256).</li><li>Count every adjacent pair of tokens in the corpus.</li><li>Merge the single most frequent pair into one new token (first new id = 256).</li><li>Repeat until you hit the target vocabulary size.</li></ul>
+<h2 id="what-gpt-2-s-tokenizer-actually-is">What GPT-2's tokenizer actually is<a class="anchor" href="#what-gpt-2-s-tokenizer-actually-is" aria-label="Link to this section" tabindex="-1">#</a></h2>
+<p>Its vocabulary is <strong>50,257</strong> tokens, and that number isn't arbitrary: 256 base bytes, plus 50,000 learned merges, plus 1 special end-of-text marker. On English it compresses to roughly 4 bytes per token. That "1 token ≈ 4 characters" rule of thumb on every pricing page? This is where it comes from.</p>
+<p>Encoding at inference is just: bytes → apply the learned merges in order → token ids. Decoding walks the merges backward to reconstruct the exact bytes. Fully reversible.</p>
+<figure id="fig-tok-02-bpe-merge-loop" class="fig"><div class="fig-frame" style="aspect-ratio:1200/675"><iframe src="/fig/tok-02-bpe-merge-loop.html" title="The BPE training loop, worked on a tiny corpus" loading="lazy" scrolling="no" style="width:1200px;height:675px"></iframe></div><a class="fig-open" href="/fig/tok-02-bpe-merge-loop.html" target="_blank" rel="noopener">Open figure</a><figcaption>The BPE training loop, worked on a tiny corpus</figcaption></figure>
+<h2 id="the-details-that-break-real-systems">The details that break real systems<a class="anchor" href="#the-details-that-break-real-systems" aria-label="Link to this section" tabindex="-1">#</a></h2>
+<p>This is the part most explainers skip, and it is where the bookmarks live.</p>
+<ul><li><strong>The space is part of the token.</strong> "the" and " the" are different tokens - in GPT-2, id <strong>1169</strong> versus id <strong>262</strong>. The space-prefixed form is so much more common that it earned the smaller number. This is why prompts are whitespace-sensitive and why a stray leading space quietly changes behavior.</li><li><strong>Numbers get chopped.</strong> GPT-2 splits "1234567" into "123 · 45 · 67" - three ragged tokens. That misalignment is a real reason models fumble arithmetic: the digits never arrive as clean, place-aligned units.</li><li><strong>The multilingual tax is real.</strong> English runs about 4 bytes per token; many other languages need two to three times more tokens for the same meaning. Same paragraph, more tokens, higher cost, less usable context. The gap is baked into the tokenizer.</li><li><strong>Glitch tokens.</strong> BPE merged some strings into a single token - the infamous " SolidGoldMagikarp" is one real GPT-2 token, id <strong>43453</strong> - that then almost never appeared in training. The embedding was created but never <em>learned</em>, so feeding it makes models hallucinate or break. A ghost left behind by the merge step.</li></ul>
+<figure id="fig-tok-03-gotchas" class="fig"><div class="fig-frame" style="aspect-ratio:1200/675"><iframe src="/fig/tok-03-gotchas.html" title="Four things that break in production" loading="lazy" scrolling="no" style="width:1200px;height:675px"></iframe></div><a class="fig-open" href="/fig/tok-03-gotchas.html" target="_blank" rel="noopener">Open figure</a><figcaption>Four things that break in production</figcaption></figure>
+<h2 id="the-mental-model-to-keep">The mental model to keep<a class="anchor" href="#the-mental-model-to-keep" aria-label="Link to this section" tabindex="-1">#</a></h2>
+<p>Tokenization is a compression problem wearing a linguistics costume. Every design choice trades between three things:</p>
+<ul><li><strong>Vocabulary size</strong> - embedding parameters.</li><li><strong>Sequence length</strong> - attention cost and context.</li><li><strong>Robustness</strong> - never emit an unknown, handle anything.</li></ul>
+<blockquote><p>Character optimizes robustness and kills compression. Word optimizes compression and kills robustness. Byte is bulletproof but slow. BPE is the negotiated peace - which is why a 2016 translation trick still runs inside models built today.</p></blockquote>
+<h2 id="why-this-is-worth-a-whole-lecture">Why this is worth a whole lecture<a class="anchor" href="#why-this-is-worth-a-whole-lecture" aria-label="Link to this section" tabindex="-1">#</a></h2>
+<p>You can't reason about context windows, API cost, why your non-English users pay more, or why the model can't add - until you accept that none of it is text to the model. It is integers, and the tokenizer chose them. Learn this one layer and half the "weird LLM behavior" you filed under magic turns into arithmetic.</p>
+<p>The full lecture is free: <a href="https://cs336.stanford.edu/">Stanford CS336, Lecture 1</a>. If you want it to truly stick, their Assignment 1 has you implement BPE by hand.</p>
+<p><em>Which of these gotchas has bitten you in production?</em></p>
+<p>Source: Stanford CS336 - Language Modeling from Scratch, Lecture 1. Diagrams drawn from the lecture by @sushant_p18; every token id verified against the GPT-2 tokenizer.</p></div>
+      <footer class="art-foot">Found an error or a missing piece? Tell me -
+        <a href="https://x.com/sushant_p18">@sushant_p18</a>.</footer>
+    </article>
+    <nav class="pager" aria-label="Chapter pagination"><a class="next" href="/hidden-language-tax/"><small>Next &middot; 02</small><span>The hidden language tax</span></a></nav>
+  </main>
+</div>
+<div class="lightbox" id="lightbox" hidden>
+  <button class="lightbox-close" type="button" aria-label="Close diagram">Close</button>
+  <figure><img id="lightbox-image" src="" alt="">
+    <figcaption id="lightbox-caption"></figcaption></figure>
+</div>
+<script type="application/json" id="book-map">[{"slug":"core-llm","chapters":["an-llm-has-never-seen-a-letter","hidden-language-tax"]},{"slug":"agent-patterns","chapters":[]},{"slug":"inference","chapters":[]},{"slug":"machine-learning","chapters":[]},{"slug":"data-analysis","chapters":[]}]</script>
+<div class="find" id="find" hidden>
+  <div class="find-box" role="dialog" aria-modal="true" aria-label="Search the book">
+    <input id="find-input" type="search" autocomplete="off" spellcheck="false"
+      placeholder="Search chapters and sections" aria-label="Search chapters and sections"
+      aria-controls="find-results" aria-expanded="true">
+    <ul class="find-results" id="find-results" role="listbox" aria-label="Results"></ul>
+    <p class="find-foot"><kbd>&uarr;</kbd><kbd>&darr;</kbd> move
+      <kbd>&crarr;</kbd> open <kbd>esc</kbd> close</p>
+  </div>
+</div>
+<script src="/script.js" defer></script>
+</body>
+</html>

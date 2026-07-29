@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="style/cerebras-style.css">
+<style>
+  .lede { position:absolute; top:76px; left:44px; right:44px; display:flex; justify-content:space-between; align-items:flex-start; }
+  .lede .q { font-size:14.5px; color:var(--ink-soft); line-height:1.5; max-width:620px; }
+  .lede .q b { color:var(--ink); font-weight:700; }
+  .lede .bad { background:var(--panel-2); border:1.5px dashed var(--penal); border-radius:8px; padding:9px 15px; text-align:right; }
+  .lede .bad .k { font-family:var(--mono); font-size:9px; letter-spacing:1.4px; text-transform:uppercase; color:var(--muted); font-weight:700; }
+  .lede .bad .v { font-size:15px; color:var(--penal); text-decoration:line-through; margin-top:5px; font-weight:700; }
+
+  .grid { position:absolute; left:44px; right:44px; top:172px;
+    display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr 1fr; gap:12px; height:322px; }
+  .q6 { background:var(--panel); border:1.5px solid var(--hairline); border-radius:10px; box-shadow:var(--shadow-sm);
+    padding:13px 17px; display:grid; grid-template-columns:30px 1fr; gap:13px; align-items:start; }
+  .q6 .n { font-family:var(--mono); font-size:11px; font-weight:700; color:#fff; background:var(--ink);
+    border-radius:5px; padding:4px 0; text-align:center; }
+  .q6.key .n { background:var(--accent); }
+  .q6 .h { font-weight:700; font-size:14.5px; letter-spacing:-.2px; }
+  .q6 .d { font-size:12.5px; color:var(--ink-soft); line-height:1.45; margin-top:5px; }
+  .q6 .d b { color:var(--ink); }
+  .q6 .u { font-family:var(--mono); font-size:9.5px; letter-spacing:1.1px; text-transform:uppercase;
+    color:var(--accent); font-weight:700; margin-top:7px; display:block; }
+
+  .callout { position:absolute; left:44px; right:44px; bottom:74px; padding:13px 20px; }
+  .callout .t { font-size:13.5px; line-height:1.5; }
+</style></head>
+<body>
+  <div class="figbar">
+    <div class="l">EVALUATION <span class="dim">/ SIX QUESTIONS THAT ACTUALLY TEST MULTILINGUAL SUPPORT</span></div>
+    <div class="r">ASK THESE INSTEAD</div>
+  </div>
+
+  <div class="lede">
+    <div class="q">“Supports 22 languages” is a <b>product claim</b>, not a measurement. Every question below
+      is answerable with a tokenizer file and an afternoon.</div>
+    <div class="bad"><div class="k">THE QUESTION TO STOP ASKING</div><div class="v">“Does it support Hindi?”</div></div>
+  </div>
+
+  <div class="grid">
+    <div class="q6 key">
+      <div class="n">1</div>
+      <div><div class="h">Fertility</div>
+        <div class="d">Tokens per word on <b>representative native-script</b> and romanised corpora — not on a translated benchmark.</div>
+        <span class="u">MEASURE IT YOURSELF · IT TAKES MINUTES</span></div>
+    </div>
+    <div class="q6">
+      <div class="n">2</div>
+      <div><div class="h">Compression</div>
+        <div class="d">Bytes or characters per token. Catches the <b>mid-codepoint splitting</b> that fertility alone hides.</div></div>
+    </div>
+    <div class="q6">
+      <div class="n">3</div>
+      <div><div class="h">Effective context</div>
+        <div class="d">How much <b>actual language</b> fits in the advertised window — after system prompt, tools and output.</div></div>
+    </div>
+    <div class="q6">
+      <div class="n">4</div>
+      <div><div class="h">Serving impact</div>
+        <div class="d">Prefill latency, KV-cache footprint and throughput on <b>matched-content</b> prompts, not matched token counts.</div></div>
+    </div>
+    <div class="q6 key">
+      <div class="n">5</div>
+      <div><div class="h">Economics</div>
+        <div class="d">Cost per <b>word, conversation, or completed task</b>. Per-token pricing quietly bills fragmentation to the user.</div>
+        <span class="u">THE ONE THAT HITS YOUR INVOICE</span></div>
+    </div>
+    <div class="q6">
+      <div class="n">6</div>
+      <div><div class="h">Quality</div>
+        <div class="d">Does lower fertility <b>preserve</b> accuracy and fluency? Fewer tokens is not automatically better learning.</div></div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <span class="lead">THE ASYMMETRY WORTH REMEMBERING</span>
+    <div class="t">A model can accept your language, answer fluently, and still charge you
+      <b>5× more per sentence</b> than it charges an English speaker — with an identical parameter count and an
+      identical advertised context window. That gap is decided <b>before training begins</b>.</div>
+  </div>
+
+  <div class="figfoot">
+    <div class="brand">FIG. 8 (UNUSED) — NOT WHETHER A MODEL <span class="hot">SPEAKS</span> YOUR LANGUAGE — WHAT IT <span class="hot">CHARGES</span> FOR IT</div>
+    <div class="brand">SOURCE: SARVAM AI + CS336 · DIAGRAM: @SUSHANT_P18</div>
+  </div>
+</body></html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="style/cerebras-style.css">
+<style>
+.stage { position: absolute; top: 74px; left: 44px; right: 44px; bottom: 64px; }
+
+/* left: sources */
+.src { position: absolute; width: 218px; }
+.src .panel { padding: 13px 16px 11px; margin-bottom: 0; }
+.src .name { font-weight: 700; font-size: 15.5px; letter-spacing: -0.2px; }
+.src .sub { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+
+/* middle: ingest + table */
+.ingest { position: absolute; left: 318px; top: 84px; width: 232px; padding: 16px 18px 14px; }
+.ingest h3 { font-family: var(--mono); font-size: 12px; letter-spacing: 2px; color: var(--ink); margin-bottom: 10px; }
+.ingest ul { list-style: none; }
+.ingest li { font-size: 12.5px; color: #57524a; padding: 5px 0; border-top: 1px solid var(--hairline); }
+.ingest li b { color: var(--ink); }
+
+.table { position: absolute; left: 318px; top: 296px; width: 232px; padding: 15px 18px 13px; border: 2px solid var(--ink); }
+.table h3 { font-family: var(--mono); font-size: 11.5px; letter-spacing: 1.6px; margin-bottom: 8px; }
+.table h3 .hot { color: var(--accent); }
+.table .row { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10.5px; padding: 5px 0; border-top: 1px solid var(--hairline); color: #57524a; }
+.table .row b { color: var(--ink); font-weight: 700; }
+
+/* right: query pipeline */
+.pipe { position: absolute; left: 648px; top: 40px; width: 210px; }
+.step { padding: 12px 16px 10px; margin-bottom: 34px; position: relative; }
+.step .name { font-weight: 700; font-size: 15px; }
+.step .sub { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+.step .n { position: absolute; top: -10px; left: 14px; background: var(--ink); color: #fff; font-family: var(--mono);
+  font-size: 10px; font-weight: 700; letter-spacing: 1px; border-radius: 4px; padding: 2px 7px; }
+
+/* far right: surfaces */
+.surf { position: absolute; left: 946px; width: 166px; }
+.surf .panel { padding: 13px 16px 11px; }
+.surf .name { font-weight: 700; font-size: 15px; }
+.surf .sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+svg.wires { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+svg.wires path { stroke: #c9c3b8; stroke-width: 2; fill: none; }
+svg.wires path.hot { stroke: var(--accent); }
+svg.wires polygon { fill: #c9c3b8; }
+svg.wires polygon.hot { fill: var(--accent); }
+</style></head>
+<body>
+  <div class="figbar">
+    <div class="l">CEREBRAS KNOWLEDGE <span class="dim">/ SYSTEM OVERVIEW</span></div>
+    <div class="r">15,000 QUESTIONS / DAY</div>
+  </div>
+
+  <div class="stage">
+    <svg class="wires">
+      <!-- sources -> ingest -->
+      <path d="M 218 46 C 268 46, 268 130, 314 130"/><polygon points="314,125 324,130 314,135"/>
+      <path d="M 218 156 C 262 156, 268 165, 314 168"/><polygon points="314,163 324,168 314,173"/>
+      <path d="M 218 266 C 268 266, 268 206, 314 206"/><polygon points="314,201 324,206 314,211"/>
+      <path d="M 218 376 C 278 376, 268 244, 314 244"/><polygon points="314,239 324,244 314,249"/>
+      <!-- ingest -> table -->
+      <path class="hot" d="M 434 250 L 434 288"/><polygon class="hot" points="429,288 434,298 439,288"/>
+      <!-- table -> planner -->
+      <path class="hot" d="M 552 360 C 600 360, 590 76, 644 76"/><polygon class="hot" points="644,71 654,76 644,81"/>
+      <!-- pipeline arrows -->
+      <path d="M 753 112 L 753 138"/><polygon points="748,138 753,148 758,138"/>
+      <path d="M 753 220 L 753 246"/><polygon points="748,246 753,256 758,246"/>
+      <!-- synthesis -> surfaces -->
+      <path d="M 858 290 C 906 290, 896 176, 942 176"/><polygon points="942,171 952,176 942,181"/>
+      <path d="M 858 306 C 906 306, 896 322, 942 322"/><polygon points="942,317 952,322 942,327"/>
+    </svg>
+
+    <div class="src" style="top:0"><div class="micro" style="margin-bottom:8px">DATA STAYS WHERE IT LIVES</div>
+      <div class="panel"><div class="name">Slack</div><div class="sub">threads · socket mode · real-time</div></div></div>
+    <div class="src" style="top:118px"><div class="panel"><div class="name">Code repos</div><div class="sub">40 GB+ · CocoIndex chunks</div></div></div>
+    <div class="src" style="top:228px"><div class="panel"><div class="name">Docs &amp; wiki</div><div class="sub">sections + neighbors</div></div></div>
+    <div class="src" style="top:338px"><div class="panel"><div class="name">Custom DBs</div><div class="sub">plugin scripts via PR</div></div></div>
+
+    <div class="ingest panel">
+      <h3>INGEST + DISTILL</h3>
+      <ul>
+        <li><b>LLM distillation</b> — question · summary · resolution</li>
+        <li><b>Bursting</b> — high-signal runs, IDF ≥ 4.0</li>
+        <li><b>Incremental sync</b> — changed chunks only</li>
+      </ul>
+    </div>
+
+    <div class="table panel">
+      <h3>ONE POSTGRES TABLE <span class="hot">■</span></h3>
+      <div class="row"><span>source</span><b>slack_thread</b></div>
+      <div class="row"><span>embedding</span><b>3,072 dims</b></div>
+      <div class="row"><span>content</span><b>normalized doc</b></div>
+      <div class="row"><span>metadata</span><b>channel · time</b></div>
+    </div>
+
+    <div class="pipe">
+      <div class="micro" style="margin-bottom:14px">EVERY QUERY</div>
+      <div class="step panel"><span class="n">1 PLAN</span><div class="name">Planner</div><div class="sub">LLM picks tools + sources</div></div>
+      <div class="step panel"><span class="n">2 EXECUTE</span><div class="name">Executor</div><div class="sub">parallel fan-out → evidence</div></div>
+      <div class="step panel"><span class="n">3 SYNTHESIZE</span><div class="name">Synthesis</div><div class="sub">answer + citations</div></div>
+    </div>
+
+    <div class="surf" style="top:140px"><div class="panel"><div class="name">Web UI</div><div class="sub">ask → answer</div></div></div>
+    <div class="surf" style="top:286px"><div class="panel"><div class="name">MCP tools</div><div class="sub">agents orchestrate</div></div></div>
+  </div>
+
+  <div class="figfoot">
+    <div class="brand">FIG. 1 — EVERY SOURCE, ONE EMBEDDINGS TABLE, ONE QUERY SURFACE</div>
+    <div class="brand">SOURCE: CEREBRAS ENG BLOG · DIAGRAM: @SUSHANT_P18</div>
+  </div>
+</body></html>

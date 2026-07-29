@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="style/cerebras-style.css">
+<style>
+  .lede { position:absolute; top:74px; left:44px; right:44px; display:flex; justify-content:space-between; align-items:flex-end; }
+  .lede .q { font-size:15px; color:var(--ink-soft); line-height:1.5; }
+  .lede .q b { color:var(--ink); font-weight:700; }
+  .lede .sample { font-family:var(--mono); font-size:15px; background:var(--panel); border:1.5px solid var(--hairline);
+    border-radius:8px; padding:10px 15px; box-shadow:var(--shadow-sm); color:var(--ink); text-align:center; }
+  .lede .sample .w { font-size:26px; font-weight:700; letter-spacing:-.5px; display:block; }
+  .lede .sample .g { font-size:9.5px; letter-spacing:1.4px; text-transform:uppercase; color:var(--muted); font-weight:700; display:block; margin-top:6px; }
+
+  .rows { position:absolute; top:186px; left:44px; right:44px;
+    display:grid; grid-template-rows:repeat(3,1fr); gap:13px; height:290px; }
+  .row { display:grid; grid-template-columns:172px 1fr 176px; align-items:center; gap:18px;
+    background:var(--panel); border:1.5px solid var(--hairline); border-radius:10px; box-shadow:var(--shadow-sm);
+    padding:0 20px; position:relative; }
+  .row.win { border:2px solid var(--accent); box-shadow:0 0 0 4px var(--accent-soft), var(--shadow); }
+
+  .who .name { font-weight:700; font-size:16px; letter-spacing:-.2px; }
+  .who .name .id { font-family:var(--mono); font-size:9.5px; color:var(--muted); font-weight:700; display:block;
+    margin-top:4px; letter-spacing:.8px; text-transform:uppercase; line-height:1.35; }
+
+  .toks { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+  .toks .tok { font-size:17px; padding:8px 11px; }
+  .note { font-family:var(--mono); font-size:9.5px; color:var(--danger); letter-spacing:.5px; margin-left:6px; line-height:1.4; }
+  .hex { font-family:var(--mono); font-size:10.5px; font-weight:700; color:var(--danger); margin-left:3px; letter-spacing:.3px; }
+
+  .metric { text-align:right; }
+  .metric .ratio { font-family:var(--mono); font-weight:700; font-size:30px; letter-spacing:-1.5px; line-height:1; }
+  .metric .ratio .u { font-size:11px; color:var(--muted); letter-spacing:0; font-weight:700; }
+  .metric.hot .ratio { color:var(--accent); }
+  .metric .bpt { font-family:var(--mono); font-size:9.5px; letter-spacing:1.1px; text-transform:uppercase; color:var(--muted); margin-top:7px; }
+  .tagpin { position:absolute; top:-9px; right:16px; }
+
+  .alsoStrip { position:absolute; left:44px; right:44px; top:496px;
+    background:var(--panel-2); border:1.5px solid var(--hairline); border-radius:9px; padding:10px 18px;
+    display:grid; grid-template-columns:96px 1fr 1fr 1fr; align-items:center; gap:16px; }
+  .alsoStrip .k { font-family:var(--mono); font-size:9px; letter-spacing:1.4px; text-transform:uppercase;
+    color:var(--muted); font-weight:700; line-height:1.35; }
+  .alsoStrip .cell { font-family:var(--mono); font-size:11.5px; color:var(--ink-soft); white-space:nowrap;
+    border-left:1.5px solid var(--hairline); padding-left:16px; }
+  .alsoStrip .cell b { color:var(--ink); font-size:13px; }
+  .alsoStrip .cell .o { color:var(--accent); font-weight:700; }
+  .alsoStrip .cell .bad { color:var(--danger); font-weight:700; }
+</style></head>
+<body>
+  <div class="figbar">
+    <div class="l">TOKEN FERTILITY <span class="dim">/ ONE HINDI WORD, THREE TOKENIZERS</span></div>
+    <div class="r">MEASURED · TOKENS PER WORD</div>
+  </div>
+
+  <div class="lede">
+    <div class="q">All three tokenizers are handed the <b>same 15 bytes</b>.<br>
+      One returns a word. One returns syllables. One returns <b>fragments of a single character</b>.</div>
+    <div class="sample"><span class="w">सरकार</span><span class="g">“GOVERNMENT” · 5 CHARS · 15 UTF-8 BYTES</span></div>
+  </div>
+
+  <div class="rows">
+    <!-- SARVAM -->
+    <div class="row win">
+      <div class="tagpin"><span class="chip boost">ONE WORD, ONE TOKEN</span></div>
+      <div class="who"><div class="name">Sarvam-1<span class="id">custom Indic BPE<br>68,096 vocab</span></div></div>
+      <div class="toks">
+        <span class="tok merge"><span class="spc">▁</span>सरकार<span class="id">7243</span></span>
+      </div>
+      <div class="metric hot">
+        <div class="ratio">1<span class="u"> TOKEN</span></div>
+        <div class="bpt">15.0 bytes / token</div>
+      </div>
+    </div>
+
+    <!-- o200k -->
+    <div class="row">
+      <div class="who"><div class="name">o200k_base<span class="id">GPT-4o family</span></div></div>
+      <div class="toks">
+        <span class="tok char">सर<span class="id">41175</span></span>
+        <span class="tok char">कार<span class="id">13910</span></span>
+      </div>
+      <div class="metric">
+        <div class="ratio">2<span class="u"> TOKENS</span></div>
+        <div class="bpt">7.5 bytes / token</div>
+      </div>
+    </div>
+
+    <!-- cl100k -->
+    <div class="row">
+      <div class="who"><div class="name">cl100k_base<span class="id">GPT-4 / 3.5 era</span></div></div>
+      <div class="toks">
+        <span class="tok byte">स<span class="id">79468</span></span>
+        <span class="tok byte">र<span class="id">45279</span></span>
+        <span class="tok byte">क<span class="id">65804</span></span>
+        <span class="tok glitch">ा<span class="hex">+e0 a4</span><span class="id">32511</span></span>
+        <span class="tok glitch"><span class="hex">b0</span><span class="id">108</span></span>
+        <span class="note">↑ the final र is split<br>across two tokens</span>
+      </div>
+      <div class="metric">
+        <div class="ratio">5<span class="u"> TOKENS</span></div>
+        <div class="bpt">3.0 bytes / token</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="alsoStrip">
+    <span class="k">SAME<br>PATTERN</span>
+    <span class="cell"><b>शिक्षा</b> “education”<br>sarvam <span class="o">1</span> · o200k 3 · cl100k <span class="bad">7</span></span>
+    <span class="cell"><b>व्यवस्था</b> “system”<br>sarvam <span class="o">1</span> · o200k 3 · cl100k <span class="bad">10</span></span>
+    <span class="cell"><b>“education”</b> in English<br>all three tokenizers: <span class="o">1 token</span></span>
+  </div>
+
+  <div class="figfoot">
+    <div class="brand">FIG. 1 — ONE WORD, <span class="hot">1 / 2 / 5 TOKENS</span> — SET ENTIRELY BY WHO BUILT THE TOKENIZER</div>
+    <div class="brand">SOURCE: MEASURED · DIAGRAM: @SUSHANT_P18</div>
+  </div>
+</body></html>

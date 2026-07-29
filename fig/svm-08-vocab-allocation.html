@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<meta name="figure-height" content="530">
+<link rel="stylesheet" href="style/distill-style.css">
+<style>
+  /* the budget as one bar being divided — because that is what it is */
+  .budget { margin-top:8px; }
+  .bbar { display:flex; height:52px; border:1px solid var(--cell); }
+  .sg { position:relative; border-right:1px solid var(--paper); display:flex;
+        align-items:center; justify-content:center; }
+  .sg:last-child { border-right:none; }
+  .sg .in { font-family:var(--mono); font-size:10px; color:#fff; opacity:.95; white-space:nowrap; }
+  .sg.latin { background:#5d87ab; }
+  .sg.deva  { background:#c1440e; }
+  .sg.i1 { background:#cf6a3d; } .sg.i2 { background:#d67f56; }
+  .sg.i3 { background:#dc906c; } .sg.i4 { background:#e2a184; }
+  .sg.i5 { background:#e7b099; } .sg.i6 { background:#ecc0af; }
+  .sg.i7 { background:#f0cec1; } .sg.i8 { background:#f5ddd4; }
+  .sg.rest { background:var(--cell-bg); }
+
+  .ticks { display:flex; margin-top:7px; }
+  .tk { position:relative; font-family:var(--sans); font-size:9.5px; color:var(--label);
+        text-align:center; line-height:1.3; }
+  .tk b { display:block; font-family:var(--mono); font-size:10.5px; color:var(--body); }
+
+  .split { display:grid; grid-template-columns:1.15fr 1fr; gap:38px; margin-top:34px; align-items:start; }
+
+  .decomp { }
+  .decomp .hd { font-size:11px; color:var(--label); margin-bottom:11px; }
+  .dr { display:grid; grid-template-columns:1fr 74px; align-items:center; height:26px;
+        font-family:var(--mono); font-size:12px; color:var(--body); border-bottom:1px solid var(--rule); }
+  .dr:last-child { border-bottom:none; }
+  .dr .v { text-align:right; }
+  .dr.tot { color:var(--ink); font-weight:700; border-bottom:none; border-top:1px solid var(--cell); margin-top:3px; }
+  .dr .g { color:var(--faint); font-size:10px; }
+
+  .cost .hd { font-size:11px; color:var(--flag); margin-bottom:11px; }
+  .cr { display:grid; grid-template-columns:76px 1fr 58px; align-items:center; height:29px;
+        font-family:var(--mono); font-size:12px; color:var(--body); }
+  .cr .s { font-size:14px; }
+  .cr .g { font-size:10px; color:var(--faint); }
+  .cr .n { text-align:right; color:var(--flag); font-weight:700; }
+</style></head>
+<body>
+  <div class="fig-title">A vocabulary is a budget
+    <span class="sub">— Sarvam-1 divided its 68,096 slots like this</span></div>
+
+  <div class="budget">
+    <div class="bbar">
+      <div class="sg latin" style="width:26.4%"><span class="in">Latin 26.4%</span></div>
+      <div class="sg deva"  style="width:17.8%"><span class="in">Devanagari 17.8%</span></div>
+      <div class="sg i1" style="width:8.7%"><span class="in">8.7</span></div>
+      <div class="sg i2" style="width:8.4%"><span class="in">8.4</span></div>
+      <div class="sg i3" style="width:7.8%"><span class="in">7.8</span></div>
+      <div class="sg i4" style="width:7.7%"><span class="in">7.7</span></div>
+      <div class="sg i5" style="width:7.5%"><span class="in">7.5</span></div>
+      <div class="sg i6" style="width:7.0%"><span class="in">7.0</span></div>
+      <div class="sg i7" style="width:5.3%"><span class="in">5.3</span></div>
+      <div class="sg i8" style="width:2.9%"><span class="in">2.9</span></div>
+      <div class="sg rest" style="width:0.6%"></div>
+    </div>
+    <div class="ticks">
+      <div class="tk" style="width:26.4%">English<b>and code</b></div>
+      <div class="tk" style="width:17.8%">Hindi, Marathi<b>Devanagari</b></div>
+      <div class="tk" style="width:8.7%">Telugu</div>
+      <div class="tk" style="width:8.4%">Kannada</div>
+      <div class="tk" style="width:7.8%">Bengali</div>
+      <div class="tk" style="width:7.7%">Gujarati</div>
+      <div class="tk" style="width:7.5%">Tamil</div>
+      <div class="tk" style="width:7.0%">Gurmukhi</div>
+      <div class="tk" style="width:5.3%">Malayalam</div>
+      <div class="tk" style="width:2.9%">Oriya</div>
+      <div class="tk" style="width:0.6%"></div>
+    </div>
+  </div>
+
+  <div class="split">
+    <div class="decomp">
+      <div class="hd">Where all 68,096 slots go</div>
+      <div class="dr"><span>learned tokens <span class="g">— the bar above</span></span><span class="v">63,741</span></div>
+      <div class="dr"><span>reserved <span class="g">— room to grow later</span></span><span class="v">4,096</span></div>
+      <div class="dr"><span>raw byte values <span class="g">— the fallback net</span></span><span class="v">256</span></div>
+      <div class="dr"><span>special <span class="g">— unk, start, end</span></span><span class="v">3</span></div>
+      <div class="dr tot"><span>total</span><span class="v">68,096</span></div>
+    </div>
+
+    <div class="cost">
+      <div class="hd">What the other side of the budget costs</div>
+      <div class="cr"><span class="s">Москва</span><span class="g">6 characters</span><span class="n">13</span></div>
+      <div class="cr"><span class="s">مرحبا</span><span class="g">5 characters</span><span class="n">11</span></div>
+      <div class="cr"><span class="s">北京</span><span class="g">2 characters</span><span class="n">7</span></div>
+      <div class="cr"><span class="s">🙏</span><span class="g">1 character</span><span class="n">5</span></div>
+      <div class="lbl tiny" style="margin-top:9px">Scripts outside the eleven get no learned tokens at all —
+        they fall through to raw bytes at <b>two to four tokens per character</b>.</div>
+    </div>
+  </div>
+
+  <div class="caption">
+    <b>The allocation is the design decision.</b> Devanagari takes roughly double the next script, which
+    tracks Hindi being about a fifth of the training corpus; Latin still takes the largest single share.
+    Every slot given to one script is a slot withheld from another — which is why this one bar explains
+    <span class="hi">both the fertility win and its limits</span>, with no benchmark involved.
+  </div>
+  <div class="credit">Read from the published Sarvam-1 tokenizer.json<span class="sep">·</span>@sushant_p18</div>
+</body></html>

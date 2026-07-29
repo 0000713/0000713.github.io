@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<meta name="figure-height" content="420">
+<link rel="stylesheet" href="style/distill-style.css">
+<style>
+  .doc { position:relative; margin-top:28px; height:104px; }
+  /* the document: one long strip of Hindi prose, 7,646 words of it */
+  .strip { position:absolute; left:0; right:0; top:0; height:56px;
+    background:var(--cell-bg); border:1px solid var(--rule); overflow:hidden; }
+  /* Both layers use an identical fixed-width .txt so the glyphs land in exactly the
+     same places; the overlay is then clipped by its parent's width. */
+  .txt { width:1118px; padding:7px 9px; font-size:9.5px; line-height:1.62;
+    color:#cdcdcd; word-break:break-word; font-family:var(--serif); }
+  .fits { position:absolute; left:0; top:0; height:56px; overflow:hidden;
+    border-right:2px solid var(--ink); background:var(--paper); }
+  .fits .txt { color:var(--body); }
+  .fits.a { border-right-color:var(--warm); }
+  .fits.b { border-right-color:var(--cool); }
+  .fits.c { border-right-color:var(--flag); }
+
+  .marks { position:absolute; left:0; right:0; top:62px; height:40px; }
+  .mk { position:absolute; top:0; transform:translateX(-1px); }
+  .mk .tick { width:1px; height:9px; background:var(--cell); }
+  .mk .t { font-family:var(--sans); font-size:10px; color:var(--label); margin-top:5px; white-space:nowrap; }
+  .mk .t b { font-family:var(--mono); font-size:11.5px; }
+  .mk.a .t b { color:var(--warm); } .mk.a .tick { background:var(--warm); }
+  .mk.b .t b { color:var(--cool); } .mk.b .tick { background:var(--cool); }
+  .mk.c .t b { color:var(--flag); } .mk.c .tick { background:var(--flag); }
+  .mk.right { transform:translateX(-100%); } .mk.right .tick { margin-left:auto; }
+
+  .rows { margin-top:26px; display:grid; grid-template-columns:118px 1fr 92px; gap:11px 14px; align-items:center; }
+  .rows .who { font-size:12.5px; color:var(--body); }
+  .rows .who i { font-style:normal; display:block; font-size:10px; color:var(--faint); margin-top:2px; }
+  .rows .n { font-family:var(--mono); font-size:13px; text-align:right; }
+  .rows .n b { font-size:15px; }
+</style></head>
+<body>
+  <div class="fig-title">One Hindi document, one 8,192-token window
+    <span class="sub">— how much of it fits depends entirely on the tokenizer</span></div>
+
+  <div class="doc">
+    <div class="strip"><div class="txt">सरकार ने आज नई शिक्षा नीति जारी की। यह ग्रामीण क्षेत्रों के प्राथमिक विद्यालयों पर केंद्रित है और तीन वर्षों के भीतर शिक्षक प्रशिक्षण का वादा करती है। नीति में डिजिटल शिक्षा, शिक्षकों की भर्ती, पाठ्यक्रम सुधार और मूल्यांकन प्रणाली में बदलाव के प्रस्ताव शामिल हैं। राज्य सरकारों को अगले वित्तीय वर्ष से इसे लागू करना होगा। शिक्षा मंत्रालय ने कहा कि इस पहल का उद्देश्य ग्रामीण और शहरी विद्यालयों के बीच की खाई को कम करना है। नीति में डिजिटल शिक्षा, शिक्षकों की भर्ती, पाठ्यक्रम सुधार और मूल्यांकन प्रणाली में बदलाव के प्रस्ताव शामिल हैं। राज्य सरकारों को अगले वित्तीय वर्ष से इसे लागू करना होगा।</div></div>
+    <div class="fits c" style="width:20.8%"><div class="txt">सरकार ने आज नई शिक्षा नीति जारी की। यह ग्रामीण क्षेत्रों के प्राथमिक विद्यालयों पर केंद्रित है और तीन वर्षों के भीतर शिक्षक प्रशिक्षण का वादा करती है। नीति में डिजिटल शिक्षा, शिक्षकों की भर्ती, पाठ्यक्रम सुधार और मूल्यांकन प्रणाली में बदलाव के प्रस्ताव शामिल हैं। राज्य सरकारों को अगले वित्तीय वर्ष से इसे लागू करना होगा। शिक्षा मंत्रालय ने कहा कि इस पहल का उद्देश्य ग्रामीण और शहरी विद्यालयों के बीच की खाई को कम करना है। नीति में डिजिटल शिक्षा, शिक्षकों की भर्ती, पाठ्यक्रम सुधार और मूल्यांकन प्रणाली में बदलाव के प्रस्ताव शामिल हैं। राज्य सरकारों को अगले वित्तीय वर्ष से इसे लागू करना होगा।</div></div>
+
+    <div class="marks">
+      <div class="mk c" style="left:20.8%"><div class="tick"></div>
+        <div class="t"><b>1,593</b> words — cl100k is full here</div></div>
+      <div class="mk b" style="left:88.2%"><div class="tick"></div>
+        <div class="t" style="transform:translateX(-72%)"><b>6,746</b> — o200k</div></div>
+      <div class="mk a right" style="left:100%"><div class="tick"></div>
+        <div class="t"><b>7,646</b> — Sarvam-1</div></div>
+    </div>
+  </div>
+
+  <div class="rows">
+    <div class="who">Sarvam-1<i>custom Indic BPE</i></div>
+    <div class="bar warm"><span style="width:100%"></span></div>
+    <div class="n"><b>7,646</b> words</div>
+
+    <div class="who">o200k<i>GPT-4o family</i></div>
+    <div class="bar cool"><span style="width:88.2%"></span></div>
+    <div class="n"><b>6,746</b> words</div>
+
+    <div class="who">cl100k<i>GPT-4 / 3.5 era</i></div>
+    <div class="bar flag"><span style="width:20.8%"></span></div>
+    <div class="n"><b>1,593</b> words</div>
+  </div>
+
+  <div class="caption">
+    <b>“8,192 tokens” is not a fixed amount of language.</b> The window is the same size in every case; what
+    changes is how much Hindi the tokenizer can pack into it. Under the GPT-4-era encoding the document runs
+    out of room <span class="hi">after a fifth of its length</span> — the greyed text is what would not fit.
+  </div>
+  <div class="credit">Measured on the Sarvam-1 tokenizer and OpenAI tiktoken<span class="sep">·</span>@sushant_p18</div>
+</body></html>

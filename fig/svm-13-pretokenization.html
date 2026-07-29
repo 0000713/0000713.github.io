@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<meta name="figure-height" content="440">
+<link rel="stylesheet" href="style/distill-style.css">
+<style>
+  .two { display:grid; grid-template-columns:1fr 1fr; gap:0 46px; margin-top:22px; align-items:start; }
+  .col > .h { font-size:13px; font-weight:700; margin-bottom:3px; }
+  .col > .sub2 { font-size:10.5px; color:var(--label); margin-bottom:18px; }
+  .col.a > .h { color:var(--cool); }
+  .col.b > .h { color:var(--warm); }
+
+  .r { display:grid; grid-template-columns:78px 1fr; align-items:center; gap:12px; margin-bottom:13px; }
+  .r .n { font-family:var(--mono); font-size:13px; color:var(--body); text-align:right; }
+  .cells { display:flex; gap:3px; }
+  .t { display:inline-flex; align-items:center; justify-content:center; height:26px; min-width:26px;
+       padding:0 7px; border:1px solid var(--cell); font-family:var(--mono); font-size:12.5px;
+       color:var(--body); background:var(--paper); }
+  .col.a .t { background:var(--cool-fill); border-color:var(--cool-line); color:var(--cool); }
+  .col.b .t { background:var(--paper); }
+  .col.b .t.same { background:var(--warm-fill); border-color:var(--warm-line); color:var(--warm); }
+  .t.sp { color:var(--faint); }
+
+  .verdict { margin-top:6px; padding-top:14px; border-top:1px solid var(--rule);
+             font-family:var(--serif); font-size:12.5px; line-height:1.6; color:var(--body); }
+  .verdict b { color:var(--ink); }
+  .verdict .big { display:block; font-family:var(--mono); font-size:19px; font-weight:700;
+                  margin-bottom:7px; }
+  .col.a .verdict .big { color:var(--cool); }
+  .col.b .verdict .big { color:var(--warm); }
+</style></head>
+<body>
+  <div class="fig-title">One regular expression, decided before any learning
+    <span class="sub">— the same three numbers, cut by two different pre-tokenizers</span></div>
+
+  <div class="two">
+
+    <div class="col a">
+      <div class="h">Group digits in threes</div>
+      <div class="sub2">GPT-4 and GPT-4o encodings</div>
+
+      <div class="r"><span class="n">1234567</span>
+        <span class="cells"><span class="t">123</span><span class="t">456</span><span class="t">7</span></span></div>
+      <div class="r"><span class="n">234567</span>
+        <span class="cells"><span class="t">234</span><span class="t">567</span></span></div>
+      <div class="r"><span class="n">34567</span>
+        <span class="cells"><span class="t">345</span><span class="t">67</span></span></div>
+
+      <div class="verdict">
+        <span class="big">0 tokens in common</span>
+        Drop a single leading digit and the grouping shifts underneath everything. A “4” sitting in the
+        thousands column is a <b>different token</b> depending on how long the number happens to be, so
+        place value never arrives intact.
+      </div>
+    </div>
+
+    <div class="col b">
+      <div class="h">Split every digit</div>
+      <div class="sub2">Sarvam-1, and several other current models</div>
+
+      <div class="r"><span class="n">1234567</span>
+        <span class="cells"><span class="t sp">▁</span><span class="t">1</span><span class="t same">2</span><span class="t same">3</span><span class="t same">4</span><span class="t same">5</span><span class="t same">6</span><span class="t same">7</span></span></div>
+      <div class="r"><span class="n">234567</span>
+        <span class="cells"><span class="t sp">▁</span><span class="t same">2</span><span class="t same">3</span><span class="t same">4</span><span class="t same">5</span><span class="t same">6</span><span class="t same">7</span></span></div>
+      <div class="r"><span class="n">34567</span>
+        <span class="cells"><span class="t sp">▁</span><span class="t same">3</span><span class="t same">4</span><span class="t same">5</span><span class="t same">6</span><span class="t same">7</span></span></div>
+
+      <div class="verdict">
+        <span class="big">every digit stable</span>
+        A “4” is the same token wherever it appears. The cost is real — eight positions instead of three
+        for one number — and it is paid deliberately, because <b>arithmetic needs place value more than it
+        needs compression</b>.
+      </div>
+    </div>
+
+  </div>
+
+  <div class="caption">
+    <b>Neither is a bug.</b> They are opposite answers to the same question, and notice where the question
+    was settled: not in the merge criterion, not in the vocabulary size, but in a
+    <span class="hi">regular expression that ran before a single merge was learned</span>. Much of what
+    gets blamed on a tokenizer is really a property of its pre-tokenizer.
+  </div>
+  <div class="credit">Token ids measured on tiktoken o200k_base and the Sarvam-1 tokenizer<span class="sep">·</span>@sushant_p18</div>
+</body></html>

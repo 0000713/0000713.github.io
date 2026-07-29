@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel>
+  <title>Sushant&#x27;s Open Notebook</title>
+  <description>A field-first notebook on AI systems</description>
+  <link>https://sushant-97.github.io/</link>
+  <language>en</language>
+  <lastBuildDate>Wed, 29 Jul 2026 22:52:41 +0000</lastBuildDate>
+  <atom:link href="https://sushant-97.github.io/rss.xml" rel="self" type="application/rss+xml"/>
+  <item>
+    <title>The hidden language tax</title>
+    <link>https://sushant-97.github.io/hidden-language-tax/</link>
+    <guid isPermaLink="true">https://sushant-97.github.io/hidden-language-tax/</guid>
+    <pubDate>Sun, 26 Jul 2026 00:00:00 +0000</pubDate>
+    <description>The same 8,192-token window holds roughly 7,600 Hindi words under one tokenizer and about 1,600 under another. The whole difference comes from one small file, written by decisions taken before training began.</description>
+  </item>
+  <item>
+    <title>An LLM has never seen a letter in its life</title>
+    <link>https://sushant-97.github.io/an-llm-has-never-seen-a-letter/</link>
+    <guid isPermaLink="true">https://sushant-97.github.io/an-llm-has-never-seen-a-letter/</guid>
+    <pubDate>Tue, 21 Jul 2026 00:00:00 +0000</pubDate>
+    <description>A visual tour from raw bytes to BPE: how one invisible translation layer sets model cost, context capacity, and many of the bugs that look like model failures.</description>
+  </item>
+</channel></rss>

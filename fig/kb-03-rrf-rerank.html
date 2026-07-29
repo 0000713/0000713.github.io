@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="style/cerebras-style.css">
+<style>
+.stage { position: absolute; top: 128px; left: 44px; right: 44px; bottom: 64px; }
+
+.lists { position: absolute; top: 24px; left: 0; width: 252px; }
+.rlist { padding: 10px 13px 8px; margin-bottom: 14px; }
+.rlist .name { font-family: var(--mono); font-size: 10.5px; font-weight: 700; letter-spacing: 1.6px; margin-bottom: 5px; }
+.rlist .row { display: flex; gap: 8px; font-family: var(--mono); font-size: 10.5px; color: #57524a; padding: 3px 0; border-top: 1px solid var(--hairline); }
+.rlist .row .n { color: var(--muted); width: 10px; }
+.rlist .row b { color: var(--ink); font-weight: 700; }
+
+.fuse { position: absolute; top: 96px; left: 330px; width: 268px; padding: 16px 19px 14px; border: 2px solid var(--ink); }
+.fuse h3 { font-family: var(--mono); font-size: 12px; letter-spacing: 2px; margin-bottom: 4px; }
+.fuse .formula { font-family: var(--mono); font-size: 12.5px; color: var(--accent); font-weight: 700; margin: 8px 0 10px; }
+.fuse .row { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10.5px; padding: 5px 0; border-top: 1px solid var(--hairline); }
+.fuse .row b { font-weight: 700; }
+.fuse .row .sc { color: var(--muted); }
+.fuse .note { font-size: 11px; color: var(--muted); margin-top: 9px; line-height: 1.4; }
+
+.rerank { position: absolute; top: 60px; left: 678px; width: 200px; padding: 14px 17px 12px; }
+.rerank .name { font-weight: 700; font-size: 15px; }
+.rerank .sub { font-size: 11.5px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+.rerank .badge { margin-top: 9px; }
+
+.out { position: absolute; top: 268px; left: 678px; width: 200px; padding: 14px 17px 12px; border: 2px solid var(--accent); background: #fff; border-radius: 10px; }
+.out .name { font-weight: 700; font-size: 15px; color: var(--accent); }
+.out .sub { font-size: 11.5px; color: #57524a; margin-top: 3px; line-height: 1.4; }
+
+.stat { position: absolute; top: 96px; left: 952px; width: 160px; }
+.stat .big { font-size: 44px; font-weight: 800; letter-spacing: -2px; }
+.stat .lbl { font-family: var(--mono); font-size: 10px; letter-spacing: 1.6px; color: var(--muted); margin-top: 2px; }
+.stat .div { border-top: 1.5px solid var(--hairline); margin: 16px 0; }
+
+svg.wires { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+svg.wires path { stroke: #c9c3b8; stroke-width: 2; fill: none; }
+svg.wires path.hot { stroke: var(--accent); }
+svg.wires polygon { fill: #c9c3b8; }
+svg.wires polygon.hot { fill: var(--accent); }
+</style></head>
+<body>
+  <div class="figbar">
+    <div class="l">RERANKING <span class="dim">/ RECIPROCAL RANK FUSION</span></div>
+    <div class="r">CONSENSUS &gt; ONE STRONG VOTE</div>
+  </div>
+
+  <div class="stage">
+    <svg class="wires">
+      <path d="M 252 86 C 292 86, 286 170, 326 176"/><polygon points="326,171 336,176 326,181"/>
+      <path d="M 252 210 C 292 210, 286 208, 326 210"/><polygon points="326,205 336,210 326,215"/>
+      <path d="M 252 334 C 292 334, 286 248, 326 244"/><polygon points="326,239 336,244 326,249"/>
+      <path class="hot" d="M 598 160 C 638 160, 634 128, 674 128"/><polygon class="hot" points="674,123 684,128 674,133"/>
+      <path class="hot" d="M 778 208 L 778 260"/><polygon class="hot" points="773,260 778,270 783,260"/>
+    </svg>
+
+    <div class="lists">
+      <div class="micro" style="margin-bottom:8px">INCOMPATIBLE RANKED LISTS</div>
+      <div class="rlist panel"><div class="name">VECTOR</div>
+        <div class="row"><span class="n">1</span><b>THREAD: NFS STALL</b></div>
+        <div class="row"><span class="n">2</span><span>CLASS: CKPTLOADER</span></div>
+        <div class="row"><span class="n">3</span><span>WIKI: LOAD STALLS</span></div></div>
+      <div class="rlist panel"><div class="name">FULL-TEXT</div>
+        <div class="row"><span class="n">1</span><b>CKPT_LOADER.CC</b></div>
+        <div class="row"><span class="n">2</span><span>CLASS: CKPTLOADER</span></div>
+        <div class="row"><span class="n">3</span><span>THREAD: NFS STALL</span></div></div>
+      <div class="rlist panel"><div class="name">WIKI / DOCS</div>
+        <div class="row"><span class="n">1</span><b>WIKI: CKPT FORMAT</b></div>
+        <div class="row"><span class="n">2</span><span>RUNBOOK: NFS MOUNTS</span></div>
+        <div class="row"><span class="n">3</span><span>CLASS: CKPTLOADER</span></div></div>
+    </div>
+
+    <div class="fuse panel">
+      <h3>RRF FUSION</h3>
+      <div class="formula">SCORE(D) = Σ 1 / (60 + RANK)</div>
+      <div class="row"><b>1 CLASS: CKPTLOADER</b><span class="sc">0.0792</span></div>
+      <div class="row"><b>2 THREAD: NFS STALL</b><span class="sc">0.0776</span></div>
+      <div class="row"><span>3 WIKI: CKPT FORMAT</span><span class="sc">0.0640</span></div>
+      <div class="row"><span>4 RUNBOOK: NFS MOUNTS</span><span class="sc">0.0476</span></div>
+      <div class="note">K = 60 smooths ranks: appearing in <b>every</b> list beats ranking #1 in one.</div>
+    </div>
+
+    <div class="rerank panel">
+      <div class="name">Reranker model</div>
+      <div class="sub">small LLM scores top ~20 against the actual question, 0–10</div>
+      <div class="badge"><span class="chip neutral">DEDUPE PER SOURCE</span></div>
+      <div class="badge" style="margin-top:5px"><span class="chip neutral">CAP PER FILE</span></div>
+    </div>
+
+    <div class="out">
+      <div class="name">Top 10 + context</div>
+      <div class="sub">winners re-expanded with neighboring sections — no lonely paragraphs</div>
+    </div>
+
+    <div class="stat">
+      <div class="big">Σ</div>
+      <div class="lbl">EVIDENCE, NOT GUESSES</div>
+      <div class="div"></div>
+      <div class="big" style="color:var(--accent)">10</div>
+      <div class="lbl">DOCS REACH THE LLM</div>
+    </div>
+  </div>
+
+  <div class="figfoot">
+    <div class="brand">FIG. 3 — FUSE → DEDUPE → RERANK → EXPAND CONTEXT</div>
+    <div class="brand">SOURCE: CEREBRAS ENG BLOG · DIAGRAM: @SUSHANT_P18</div>
+  </div>
+</body></html>

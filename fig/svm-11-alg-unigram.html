@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<meta name="figure-height" content="595">
+<link rel="stylesheet" href="style/distill-style.css">
+<style>
+  .two { display:grid; grid-template-columns:498px 1fr; gap:44px; align-items:start; margin-top:20px; }
+  .side .h { font-size:10.5px; color:var(--label); margin-bottom:13px; }
+
+  .dr { display:grid; grid-template-columns:56px 74px 1fr; align-items:center; height:25px;
+        font-family:var(--mono); font-size:12px; }
+  .dr .t { font-weight:700; }
+  .dr .v { text-align:right; }
+  .dr .m { font-size:10.5px; color:var(--faint); padding-left:16px; }
+  .dr.go  .t { color:var(--faint); text-decoration:line-through; }
+  .dr.go  .v { color:var(--faint); }
+  .dr.stay .t { color:var(--violet); }
+  .dr.stay .v { color:var(--violet); font-weight:700; }
+
+  .head { display:grid; grid-template-columns:56px 74px 1fr; font-size:9px; color:var(--faint);
+    padding-bottom:6px; border-bottom:1px solid var(--rule); margin-bottom:4px; }
+  .head .r { text-align:right; }
+
+  .gap { height:9px; }
+  .why { margin-top:18px; padding-top:14px; border-top:1px solid var(--rule);
+    font-family:var(--serif); font-size:12.5px; line-height:1.6; color:var(--body); }
+  .why b { color:var(--ink); }
+  .why .m { font-family:var(--mono); font-size:11.5px; color:var(--violet); }
+</style></head>
+<body>
+  <div class="fig-title">Criterion 3 — Unigram
+    <span class="sub">— nothing is ever merged; the vocabulary is carved down instead</span></div>
+
+  <div class="two">
+    <div class="code"><span class="c"># start DELIBERATELY too large: characters</span>
+<span class="c"># plus many frequent substrings</span>
+probs = {t: c / total <span class="k">for</span> t, c <span class="k">in</span> seed.items()}
+
+<span class="k">def</span> loss(vocab):
+    <span class="c"># a word can be cut many ways; Viterbi</span>
+    <span class="c"># finds the most probable one</span>
+    <span class="k">return</span> <span class="k">sum</span>(freq * best_split_cost(w, vocab)
+               <span class="k">for</span> w, freq <span class="k">in</span> corpus.items())
+
+base = loss(probs)
+
+<span class="k">for</span> tok <span class="k">in</span> candidates:
+<span class="hl">    delta[tok] = loss(probs - tok) - base  # ← the criterion</span>
+
+<span class="c"># drop the cheapest 10–20%, then repeat</span>
+drop(<span class="k">sorted</span>(delta)[:k])</div>
+
+    <div class="side">
+      <div class="h">What each candidate costs to delete</div>
+
+      <div class="head"><span>TOKEN</span><span class="r">LOSS +</span><span class="m">&nbsp;</span></div>
+
+      <div class="dr go"><span class="t">ug</span><span class="v">0.00</span><span class="m">pug re-splits as pu·g, same cost</span></div>
+      <div class="dr go"><span class="t">pu</span><span class="v">0.00</span><span class="m">p·u is just as good</span></div>
+      <div class="dr go"><span class="t">un</span><span class="v">0.00</span><span class="m">pun and bun are whole words already</span></div>
+      <div class="dr go"><span class="t">hu</span><span class="v">0.00</span><span class="m">never used in any best split</span></div>
+      <div class="dr go"><span class="t">gs</span><span class="v">0.00</span><span class="m">hugs is a whole word already</span></div>
+      <div class="dr go"><span class="t">bu</span><span class="v">0.00</span><span class="m">never used</span></div>
+
+      <div class="gap"></div>
+
+      <div class="dr stay"><span class="t">bun</span><span class="v">10.59</span><span class="m">keep</span></div>
+      <div class="dr stay"><span class="t">hugs</span><span class="v">13.56</span><span class="m">keep</span></div>
+      <div class="dr stay"><span class="t">hug</span><span class="v">24.25</span><span class="m">keep</span></div>
+      <div class="dr stay"><span class="t">pun</span><span class="v">27.60</span><span class="m">keep</span></div>
+
+      <div class="why">A token is worth keeping only if the words containing it get <b>worse</b> without
+        it. Deleting <span class="m">ug</span> costs exactly nothing, because “pug” simply re-splits as
+        <span class="m">pu·g</span> at an identical score. Deleting <span class="m">pun</span> costs 27.6,
+        because there is no comparable way left to write it.</div>
+    </div>
+  </div>
+
+  <div class="caption">
+    <b>Byte-pair encoding and WordPiece grow a vocabulary upward from characters. Unigram shrinks one
+    downward from an oversized pool</b> — and because it is a probability model rather than a merge
+    procedure, a word keeps a <span class="hi">distribution over splits</span> rather than one answer.
+    The likeliest is used at inference; sampling the alternatives during training acts as a regulariser.
+  </div>
+  <div class="credit">Losses produced by vocab_algorithms.py, published with this article<span class="sep">·</span>@sushant_p18</div>
+</body></html>

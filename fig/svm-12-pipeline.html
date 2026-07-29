@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<meta name="figure-height" content="505">
+<link rel="stylesheet" href="style/distill-style.css">
+<style>
+  .flow { position:relative; display:grid; grid-template-columns:250px 58px 1fr; gap:0 0;
+          align-items:start; margin-top:26px; }
+
+  /* stacked raw-text card */
+  .pages { position:relative; width:236px; }
+  .pages .sh { position:absolute; inset:0; border:1px solid var(--cell); background:var(--paper); border-radius:3px; }
+  .pages .sh.a { transform:translate(-7px,7px); }
+  .pages .sh.b { transform:translate(-3.5px,3.5px); }
+  .pages .pg { position:relative; border:1px solid var(--cool-line); background:var(--paper);
+               border-radius:3px; padding:14px 15px; font-family:var(--serif);
+               font-size:12.5px; line-height:1.62; color:var(--body); }
+  .cap-l { font-family:var(--sans); font-size:11.5px; font-weight:700; color:var(--cool);
+           background:var(--cool-fill); display:inline-block; padding:3px 9px; border-radius:3px;
+           margin-bottom:10px; }
+
+  .arrow { display:flex; align-items:center; justify-content:center; }
+  .arrow svg { overflow:visible; }
+
+  .right { position:relative; }
+  .step-k { font-family:var(--sans); font-size:10.5px; color:var(--label); margin-bottom:9px; }
+
+  .toks { font-size:17px; line-height:1; display:flex; }
+  .toks .t { padding:9px 2px; }
+
+  .ids { display:flex; gap:3px; margin-top:16px; }
+  .ids .i { display:inline-flex; align-items:center; justify-content:center; height:24px; padding:0 6px;
+            border:1px solid var(--cell); font-family:var(--mono); font-size:11px; color:var(--body);
+            background:var(--paper); }
+
+  .vecs { display:flex; align-items:center; gap:5px; margin-top:16px; }
+
+  .back { margin-top:20px; padding-top:13px; border-top:1px solid var(--rule);
+          font-family:var(--serif); font-size:12.5px; color:var(--body); line-height:1.55; }
+  .back b { color:var(--ink); }
+  .back .m { font-family:var(--mono); font-size:11.5px; color:var(--cool); }
+</style></head>
+<body>
+  <div class="fig-title">What the conversion layer actually does
+    <span class="sub">— text in, integers out, and the same route back again</span></div>
+
+  <div class="flow">
+    <div>
+      <div style="height:26px"></div><span class="cap-l">Raw text</span>
+      <div class="pages">
+        <div class="sh a"></div><div class="sh b"></div>
+        <div class="pg">The blue whale is a massive creature. It thrives on small ocean shrimp that can grow no more than 2 inches, known as krill.</div>
+      </div>
+    </div>
+
+    <div class="arrow">
+      <svg width="40" height="14" viewBox="0 0 40 14">
+        <path d="M0 7 H30" stroke="var(--cell)" stroke-width="1" fill="none"/>
+        <polygon points="38,7 29,3 29,11" fill="var(--cell)"/>
+      </svg>
+    </div>
+
+    <div class="right">
+      <div class="step-k">1 &nbsp;· &nbsp;SPLIT INTO TOKENS &nbsp;<span class="dim">— the boundaries are the tokenizer's decision, not the language's</span></div>
+      <div class="toks">
+        <span class="t" style="background:#dbe6f0">The</span><span class="t" style="background:#e0eaf2">&nbsp;blue</span><span class="t" style="background:#e3eff2">&nbsp;whale</span><span class="t" style="background:#e0f0ec">&nbsp;is</span><span class="t" style="background:#e6f1e4">&nbsp;a</span><span class="t" style="background:#f6efd9">&nbsp;massive</span><span class="t" style="background:#f9e6d6">&nbsp;creature</span><span class="t" style="background:#f7dcd4">.</span>
+      </div>
+
+      <div class="step-k" style="margin-top:22px">2 &nbsp;· &nbsp;LOOK EACH ONE UP IN THE VOCABULARY</div>
+      <div class="ids">
+        <span class="i">976</span><span class="i">9861</span><span class="i">103574</span><span class="i">382</span>
+        <span class="i">261</span><span class="i">18965</span><span class="i">46949</span><span class="i">13</span>
+      </div>
+
+      <div class="step-k" style="margin-top:22px">3 &nbsp;· &nbsp;EACH INTEGER INDEXES ONE ROW OF THE EMBEDDING TABLE</div>
+      <div class="vecs">
+        <span class="vec"><span>-0.1</span><span>0.4</span><span>0.9</span><span class="dots">⋮</span></span>
+        <span class="vec"><span>0.7</span><span>0.2</span><span>0.5</span><span class="dots">⋮</span></span>
+        <span class="vec"><span>-0.2</span><span>0.3</span><span>0.6</span><span class="dots">⋮</span></span>
+        <span class="vec"><span>0.5</span><span>0.8</span><span>0.8</span><span class="dots">⋮</span></span>
+        <span class="ell">…</span>
+        <span class="lbl" style="margin-left:14px">only from here on<br>does the model do arithmetic</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="back">
+    <b>The map is reversible.</b> Nothing above is lossy: the integers
+    <span class="m">976 · 9861 · 103574 · …</span> decode back to exactly the bytes that went in, which is
+    why the tokenizer can be a hard boundary rather than a guess. The only choice being made is
+    <b>where the cuts fall</b> — and every design in this article is a different answer to that.
+  </div>
+
+  <div class="caption">
+    Eight tokens for eight English words, which is close to the best case. The same sentence in a script the
+    tokenizer was not built for would produce the same three steps and a
+    <span class="hi">very different number of boxes in row 2</span> — and rows 2 and 3 are where every cost
+    in the model is counted.
+  </div>
+  <div class="credit">Token ids are real, from OpenAI o200k_base<span class="sep">·</span>@sushant_p18</div>
+</body></html>

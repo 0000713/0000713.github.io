@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<meta name="figure-height" content="565">
+<link rel="stylesheet" href="style/distill-style.css">
+<style>
+  .two { display:grid; grid-template-columns:520px 1fr; gap:44px; align-items:start; margin-top:20px; }
+  .side .h { font-size:10.5px; color:var(--label); margin-bottom:14px; }
+
+  .st { display:grid; grid-template-columns:20px 1fr; gap:12px; margin-bottom:16px; align-items:start; }
+  .st .n { font-family:var(--mono); font-size:10px; color:var(--faint); padding-top:2px; }
+  .st .b { font-size:12.5px; font-weight:700; }
+  .st .d { font-size:11.5px; color:var(--label); line-height:1.5; margin-top:3px; }
+  .st .d b { color:var(--body); }
+
+  .warn { margin-top:20px; padding-top:14px; border-top:1px solid var(--rule);
+          font-family:var(--serif); font-size:12px; line-height:1.6; color:var(--body); }
+  .warn .k { font-family:var(--sans); font-size:10px; color:var(--flag); margin-bottom:7px;
+             letter-spacing:.5px; }
+  .warn b { color:var(--ink); }
+</style></head>
+<body>
+  <div class="fig-title">How these numbers were produced
+    <span class="sub">— and what the method cannot tell you</span></div>
+
+  <div class="two">
+    <div class="code"><span class="c"># 4,000 words of real prose per language,</span>
+<span class="c"># sampled from random Wikipedia articles</span>
+corpus[lang] = fetch_random_articles(lang, n=4000)
+
+<span class="k">for</span> lang, text <span class="k">in</span> corpus.items():
+
+    words = <span class="k">len</span>(text.split())
+    <span class="k">bytes</span> = <span class="k">len</span>(text.encode(<span class="s">"utf-8"</span>))
+
+    <span class="c"># the same text through all three tokenizers</span>
+    n_sarvam = <span class="k">len</span>(sarvam.encode(text).ids)
+    n_o200k  = <span class="k">len</span>(o200k.encode(text))
+    n_cl100k = <span class="k">len</span>(cl100k.encode(text))
+
+<span class="hl">    fertility     = n_tokens / words   # needs "word"</span>
+<span class="hl">    bytes_per_tok = bytes / n_tokens   # needs nothing</span>
+
+<span class="c"># Sarvam counts exclude the BOS token — including it</span>
+<span class="c"># is the commonest way to get these numbers wrong</span></div>
+
+    <div class="side">
+      <div class="h">Why it is built this way</div>
+
+      <div class="st"><span class="n">01</span><div>
+        <div class="b">Real prose, not a written example</div>
+        <div class="d">A hand-written sentence can be accidentally easy. Random encyclopedia articles
+          bring names, numbers, loanwords and punctuation — the things that actually fragment.</div></div></div>
+
+      <div class="st"><span class="n">02</span><div>
+        <div class="b">The same text through every tokenizer</div>
+        <div class="d">No tokenizer sees text the others did not. Any difference in the output is a
+          property of the vocabulary, not of the sample.</div></div></div>
+
+      <div class="st"><span class="n">03</span><div>
+        <div class="b">Two units, because one of them is arguable</div>
+        <div class="d">Fertility depends on <b>what counts as a word</b>, and Indic morphology packs more
+          into one whitespace-delimited word than English does. Bytes per token has no such dependency.</div></div></div>
+
+      <div class="warn">
+        <div class="k">WHAT THIS CANNOT TELL YOU</div>
+        Wikipedia is one domain, and an unusually formal one. These figures do not transfer to chat logs,
+        code, or transliterated text, and they are <b>not</b> a benchmark ranking — they are one corpus,
+        measured openly, with the script published. That is the whole point: a fertility number without a
+        corpus attached is not a fact about a tokenizer.
+      </div>
+    </div>
+  </div>
+
+  <div class="caption">
+    <b>The measurement is the argument.</b> Every fertility figure quoted in this article — including the
+    vendor's own — belongs to some corpus, and most of the time nobody says which.
+    <span class="hi">Changing the corpus moved Sarvam's measured fertility from 1.40 to 2.26</span>, which is
+    the difference between comfortably inside its published range and just outside it.
+  </div>
+  <div class="credit">corpus_experiment.py, published with this article<span class="sep">·</span>@sushant_p18</div>
+</body></html>
